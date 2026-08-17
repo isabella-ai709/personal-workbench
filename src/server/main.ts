@@ -5,6 +5,7 @@ import { migrateDatabase } from "./db/migrate";
 import { CodexTaskExecutor } from "./integrations/codex/codex-task-executor";
 import { CodexSkillGateway } from "./integrations/codex/skill-gateway";
 import { WindowsFolderOpener, WindowsRecycleBin } from "./integrations/windows-shell";
+import { DashboardService } from "./modules/dashboard/dashboard-service";
 import { SkillCacheRepository } from "./modules/skills/skill-cache-repository";
 import { SkillOriginRepository } from "./modules/skills/skill-origin-repository";
 import { SkillService } from "./modules/skills/skill-service";
@@ -30,7 +31,12 @@ const skillService = new SkillService(
   new WindowsFolderOpener(),
   new WindowsRecycleBin(),
 );
-const app = buildApp(service, skillService, new LocalSession({ origin: serverOrigin(config) }));
+const app = buildApp(
+  service,
+  skillService,
+  new LocalSession({ origin: serverOrigin(config) }),
+  new DashboardService(repository, skillService),
+);
 
 const shutdown = async () => {
   await scheduler.stop();

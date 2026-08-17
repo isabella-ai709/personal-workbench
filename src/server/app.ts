@@ -2,6 +2,8 @@ import Fastify, { type FastifyInstance } from "fastify";
 import { ZodError } from "zod";
 
 import { toApiError, WorkbenchError } from "../shared/errors";
+import { registerDashboardRoutes } from "./modules/dashboard/dashboard-routes";
+import type { DashboardService } from "./modules/dashboard/dashboard-service";
 import { registerSkillRoutes } from "./modules/skills/skill-routes";
 import type { SkillService } from "./modules/skills/skill-service";
 import { registerTaskRoutes } from "./modules/tasks/task-routes";
@@ -12,11 +14,13 @@ export function buildApp(
   taskService: TaskService,
   skillService?: SkillService,
   localSession?: LocalSession,
+  dashboardService?: DashboardService,
 ): FastifyInstance {
   const app = Fastify({ logger: false });
   localSession?.register(app);
   registerTaskRoutes(app, taskService);
   if (skillService) registerSkillRoutes(app, skillService);
+  if (dashboardService) registerDashboardRoutes(app, dashboardService);
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) {
       return reply.code(400).send({

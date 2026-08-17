@@ -43,6 +43,10 @@ describe("localhost security", () => {
       "x-frame-options": "DENY",
     });
     expect(response.headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+    expect(response.headers["content-security-policy"]).toContain("script-src 'self'");
+    expect(response.headers["content-security-policy"]).toContain(
+      "style-src 'self' 'unsafe-inline'",
+    );
 
     const crossOrigin = await app.inject({
       method: "GET",

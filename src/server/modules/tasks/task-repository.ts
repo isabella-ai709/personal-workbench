@@ -82,6 +82,17 @@ export interface CompleteRunInput {
   codexThreadId?: string | null;
 }
 
+export interface TaskStatistics {
+  total: number;
+  enabled: number;
+  paused: number;
+  failedRuns: number;
+}
+
+export interface RecentTaskRun extends TaskRun {
+  taskName: string;
+}
+
 function mapTask(row: TaskRow): Task {
   return {
     id: row.id,
@@ -183,6 +194,38 @@ export class TaskRepository {
         )
         .all() as unknown as TaskRow[]
     ).map(mapTask);
+  }
+
+  getStatistics(): TaskStatistics {
+    const taskCounts = this.database
+      .prepare(
+        `SELECT COUNT(*) AS total,
+                COALESCE(SUM(CASE WHEN enabled = 1 THEN 1 ELSE 0 END), 0) AS enabled
+           FROM tasks WHERE deleted_at IS NULL`,
+      )
+      .get() as { total: number; enabled: number };
+    const failures = this.database
+      .prepare("SELECT COUNT(*) AS count FROM task_runs WHERE status = 'failed'")
+      .get() as { count: number };
+    return {
+      total: taskCounts.total,
+      enabled: taskCounts.enabled,
+      paused: taskCounts.total - taskCounts.enabled,
+      failedRuns: failures.count,
+    };
+  }
+
+  listRecentRuns(limit = 5): RecentTaskRun[] {
+    const rows = this.database
+      .prepare(
+        `SELECT task_runs.*, tasks.name AS task_name
+           FROM task_runs
+           JOIN tasks ON tasks.id = task_runs.task_id
+          ORDER BY task_runs.created_at DESC, task_runs.id DESC
+          LIMIT ?`,
+      )
+      .all(limit) as unknown as Array<TaskRunRow & { task_name: string }>;
+    return rows.map((row) => ({ ...mapRun(row), taskName: row.task_name }));
   }
 
   setNextRunAt(id: string, nextRunAt: string | null): void {

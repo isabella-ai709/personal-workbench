@@ -106,6 +106,22 @@ export const skillSummarySchema = z.object({
 });
 export type SkillSummary = z.infer<typeof skillSummarySchema>;
 
+export const dashboardSummarySchema = z.object({
+  tasks: z.object({
+    total: z.number().int().nonnegative(),
+    enabled: z.number().int().nonnegative(),
+    paused: z.number().int().nonnegative(),
+    failedRuns: z.number().int().nonnegative(),
+  }),
+  skills: z.object({
+    total: z.number().int().nonnegative(),
+    enabled: z.number().int().nonnegative(),
+    stale: z.boolean(),
+  }),
+  recentRuns: z.array(taskRunSchema.extend({ taskName: z.string().min(1).max(120) })),
+});
+export type DashboardSummary = z.infer<typeof dashboardSummarySchema>;
+
 export const paginationQuerySchema = z.object({
   cursor: z.string().min(1).max(500).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(25),
