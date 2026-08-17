@@ -20,7 +20,22 @@ export interface TaskExecutionResult {
 }
 
 export interface ScheduledTaskExecutor {
-  execute(task: Task, run: TaskRun): Promise<TaskExecutionResult>;
+  execute(task: Task, run: TaskRun, signal?: AbortSignal): Promise<TaskExecutionResult>;
+}
+
+export type TaskExecutionErrorCode =
+  "TIMEOUT" | "CANCELLED" | "AUTHENTICATION_FAILED" | "PROCESS_FAILED";
+
+export class TaskExecutionError extends Error {
+  constructor(
+    readonly code: TaskExecutionErrorCode,
+    message: string,
+    readonly runStatus: "failed" | "cancelled" = "failed",
+    readonly logPath: string | null = null,
+  ) {
+    super(message);
+    this.name = "TaskExecutionError";
+  }
 }
 
 export interface SchedulerClock {
@@ -167,10 +182,11 @@ export class TaskScheduler {
       });
     } catch (error) {
       this.repository.completeRun(claim.run.id, {
-        status: "failed",
+        status: error instanceof TaskExecutionError ? error.runStatus : "failed",
         finishedAt: this.clock.now().toISOString(),
-        errorCode: "PROCESS_FAILED",
+        errorCode: error instanceof TaskExecutionError ? error.code : "PROCESS_FAILED",
         errorMessage: error instanceof Error ? error.message : "Task execution failed",
+        logPath: error instanceof TaskExecutionError ? error.logPath : null,
       });
     }
   }
