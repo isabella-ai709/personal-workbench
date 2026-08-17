@@ -1,5 +1,5 @@
 import { buildApp } from "./app";
-import { loadServerConfig } from "./config";
+import { loadServerConfig, serverOrigin } from "./config";
 import { openDatabase } from "./db/connection";
 import { migrateDatabase } from "./db/migrate";
 import { CodexTaskExecutor } from "./integrations/codex/codex-task-executor";
@@ -11,6 +11,7 @@ import { SkillService } from "./modules/skills/skill-service";
 import { TaskRepository } from "./modules/tasks/task-repository";
 import { TaskScheduler } from "./modules/tasks/task-scheduler";
 import { TaskService } from "./modules/tasks/task-service";
+import { LocalSession } from "./security/local-session";
 
 const config = loadServerConfig();
 const database = openDatabase(config.databasePath);
@@ -29,7 +30,7 @@ const skillService = new SkillService(
   new WindowsFolderOpener(),
   new WindowsRecycleBin(),
 );
-const app = buildApp(service, skillService);
+const app = buildApp(service, skillService, new LocalSession({ origin: serverOrigin(config) }));
 
 const shutdown = async () => {
   await scheduler.stop();

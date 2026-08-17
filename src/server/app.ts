@@ -6,9 +6,15 @@ import { registerSkillRoutes } from "./modules/skills/skill-routes";
 import type { SkillService } from "./modules/skills/skill-service";
 import { registerTaskRoutes } from "./modules/tasks/task-routes";
 import type { TaskService } from "./modules/tasks/task-service";
+import type { LocalSession } from "./security/local-session";
 
-export function buildApp(taskService: TaskService, skillService?: SkillService): FastifyInstance {
+export function buildApp(
+  taskService: TaskService,
+  skillService?: SkillService,
+  localSession?: LocalSession,
+): FastifyInstance {
   const app = Fastify({ logger: false });
+  localSession?.register(app);
   registerTaskRoutes(app, taskService);
   if (skillService) registerSkillRoutes(app, skillService);
   app.setErrorHandler((error, _request, reply) => {
