@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@openai/codex-sdk": "^0.147.0",
+    "cron-parser": "^5.10.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zod": "^4.4.3"

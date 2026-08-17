@@ -63,6 +63,16 @@ export interface ClaimedTask {
   run: TaskRun;
 }
 
+export interface CompleteRunInput {
+  status: Extract<TaskRunStatus, "succeeded" | "failed" | "cancelled">;
+  finishedAt: string;
+  resultPreview?: string | null;
+  logPath?: string | null;
+  errorCode?: string | null;
+  errorMessage?: string | null;
+  codexThreadId?: string | null;
+}
+
 function mapTask(row: TaskRow): Task {
   return {
     id: row.id,
@@ -156,6 +166,16 @@ export class TaskRepository {
     ).map(mapTask);
   }
 
+  listEnabledTasks(): Task[] {
+    return (
+      this.database
+        .prepare(
+          "SELECT * FROM tasks WHERE enabled = 1 AND deleted_at IS NULL ORDER BY created_at ASC",
+        )
+        .all() as unknown as TaskRow[]
+    ).map(mapTask);
+  }
+
   setNextRunAt(id: string, nextRunAt: string | null): void {
     const result = this.database
       .prepare("UPDATE tasks SET next_run_at = ?, updated_at = ? WHERE id = ?")
@@ -223,6 +243,63 @@ export class TaskRepository {
       TaskRunRow | undefined;
     if (!row) throw new WorkbenchError("NOT_FOUND", "Task run not found", 404);
     return mapRun(row);
+  }
+
+  listRuns(taskId: string): TaskRun[] {
+    return (
+      this.database
+        .prepare("SELECT * FROM task_runs WHERE task_id = ? ORDER BY created_at DESC")
+        .all(taskId) as unknown as TaskRunRow[]
+    ).map(mapRun);
+  }
+
+  completeRun(id: string, input: CompleteRunInput): TaskRun {
+    const current = this.getRun(id);
+    if (current.status !== "running" || current.startedAt === null) {
+      throw new WorkbenchError("INVALID_STATE", "Only a running task run can be completed", 409);
+    }
+    const durationMs = Math.max(0, Date.parse(input.finishedAt) - Date.parse(current.startedAt));
+    const result = this.database
+      .prepare(
+        `UPDATE task_runs SET
+           status = ?, finished_at = ?, duration_ms = ?, result_preview = ?, log_path = ?,
+           error_code = ?, error_message = ?, codex_thread_id = ?
+         WHERE id = ? AND status = 'running'`,
+      )
+      .run(
+        input.status,
+        input.finishedAt,
+        durationMs,
+        input.resultPreview ?? null,
+        input.logPath ?? null,
+        input.errorCode ?? null,
+        input.errorMessage ?? null,
+        input.codexThreadId ?? null,
+        id,
+      );
+    if (result.changes === 0) {
+      throw new WorkbenchError("CONFLICT", "Task run changed before completion", 409);
+    }
+    return this.getRun(id);
+  }
+
+  failInterruptedRuns(finishedAt: string): number {
+    return Number(
+      this.database
+        .prepare(
+          `UPDATE task_runs SET
+             status = 'failed',
+             finished_at = ?,
+             duration_ms = CASE
+               WHEN started_at IS NULL THEN NULL
+               ELSE MAX(0, CAST((julianday(?) - julianday(started_at)) * 86400000 AS INTEGER))
+             END,
+             error_code = 'SERVICE_INTERRUPTED',
+             error_message = 'The workbench stopped before this run completed.'
+           WHERE status = 'running'`,
+        )
+        .run(finishedAt, finishedAt).changes,
+    );
   }
 
   claimNextDueTask(now: string, runId = randomUUID()): ClaimedTask | null {
