@@ -1,14 +1,18 @@
 import {
   dashboardSummarySchema,
   paginatedSchema,
+  skillSummarySchema,
   taskRunSchema,
   taskSchema,
   type CreateTaskInput,
   type DashboardSummary,
+  type SkillOrigin,
+  type SkillSummary,
   type Task,
   type TaskRun,
   type UpdateTaskInput,
 } from "../../shared/contracts";
+import { z } from "zod";
 
 interface ErrorEnvelope {
   error?: { code?: string; message?: string };
@@ -122,4 +126,45 @@ export async function getRunLog(runId: string): Promise<string> {
   });
   if (!response.ok) throw new ApiClientError("完整日志暂时无法读取", response.status);
   return response.text();
+}
+
+export interface SkillDetail extends SkillSummary {
+  content: string;
+}
+
+export async function getSkills(): Promise<SkillSummary[]> {
+  const payload = await apiRequest<unknown>("/api/skills");
+  return skillSummarySchema.array().parse((payload as { items?: unknown }).items);
+}
+
+export async function getSkill(id: string): Promise<SkillDetail> {
+  return skillSummarySchema
+    .extend({ content: z.string() })
+    .parse(await apiRequest(`/api/skills/${id}`));
+}
+
+export async function setSkillEnabled(id: string, enabled: boolean): Promise<SkillSummary> {
+  return skillSummarySchema.parse(
+    await apiRequest(`/api/skills/${id}/${enabled ? "enable" : "disable"}`, { method: "POST" }),
+  );
+}
+
+export async function setSkillOrigin(
+  id: string,
+  origin: Extract<SkillOrigin, "generated" | "installed" | "unconfirmed">,
+): Promise<SkillSummary> {
+  return skillSummarySchema.parse(
+    await apiRequest(`/api/skills/${id}/origin`, {
+      method: "PATCH",
+      body: JSON.stringify({ origin }),
+    }),
+  );
+}
+
+export async function openSkillFolder(id: string): Promise<void> {
+  await apiRequest(`/api/skills/${id}/open-folder`, { method: "POST" });
+}
+
+export async function deleteSkill(id: string): Promise<void> {
+  await apiRequest(`/api/skills/${id}`, { method: "DELETE" });
 }

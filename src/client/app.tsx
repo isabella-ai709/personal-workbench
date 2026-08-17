@@ -9,21 +9,13 @@ import { DashboardPage } from "./pages/dashboard-page";
 const TasksPage = lazy(() =>
   import("./pages/tasks-page").then((module) => ({ default: module.TasksPage })),
 );
+const SkillsPage = lazy(() =>
+  import("./pages/skills-page").then((module) => ({ default: module.SkillsPage })),
+);
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false } },
 });
-
-function PendingPage({ title }: { title: string }) {
-  return (
-    <div className="page-frame">
-      <header className="page-heading">
-        <h1>{title}</h1>
-        <p>这个页面正在接入已完成的后端能力。</p>
-      </header>
-    </div>
-  );
-}
 
 export function App() {
   return (
@@ -40,7 +32,14 @@ export function App() {
                 </Suspense>
               }
             />
-            <Route path="skills" element={<PendingPage title="Skill 管理" />} />
+            <Route
+              path="skills"
+              element={
+                <Suspense fallback={<div className="page-loading">正在加载 Skill 管理</div>}>
+                  <SkillsPage />
+                </Suspense>
+              }
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
