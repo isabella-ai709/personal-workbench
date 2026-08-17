@@ -28,7 +28,7 @@ describe("database migrations", () => {
     temporaryDirectories.push(directory);
     database = openDatabase(join(directory, "workbench.sqlite"));
 
-    expect(migrateDatabase(database)).toEqual(["001_initial.sql"]);
+    expect(migrateDatabase(database)).toEqual(["001_initial.sql", "002_skill_cache.sql"]);
     expect(migrateDatabase(database)).toEqual([]);
     const tables = database
       .prepare("SELECT name FROM sqlite_master WHERE type = 'table'")
@@ -40,6 +40,7 @@ describe("database migrations", () => {
         "task_runs",
         "skill_origin_overrides",
         "settings",
+        "skill_cache",
       ]),
     );
     expect(database.prepare("PRAGMA foreign_keys").get()).toEqual({ foreign_keys: 1 });
