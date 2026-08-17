@@ -1,0 +1,8 @@
+.superpowers/
+.env
+.env.*
+data/
+logs/
+*.db
+*.db-shm
+*.db-wal
