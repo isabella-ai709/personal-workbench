@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@11.19.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.5"
   },
   "scripts": {
     "dev": "vite",
@@ -17,6 +17,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "migrate": "tsx scripts/migrate.ts",
     "verify:codex": "tsx scripts/verify-codex-capabilities.ts",
     "check": "pnpm typecheck && pnpm test --run && pnpm lint && pnpm format:check && pnpm build"
   },
