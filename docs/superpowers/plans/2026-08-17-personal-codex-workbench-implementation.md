@@ -145,7 +145,7 @@ pnpm format:check
 2. 实现最小 JSON-RPC 客户端：启动 `codex app-server`、完成初始化、关联请求 ID、处理响应、错误和退出。
 3. 为 JSON-RPC 编解码、超时和异常退出先写基于假子进程的单元测试。
 4. 能力脚本调用 `skills/list`，打印数量和安全的元数据摘要，不打印完整 Skill 内容。
-5. 通过 `perCwdExtraUserRoots` 让 App Server 发现仓库内的专用 fixture Skill，只对它执行 `skills/config/write`。测试先记录原状态，并在 `finally` 中恢复；恢复失败时能力验证必须失败并给出人工恢复命令。
+5. 通过当前协议的 `skills/extraRoots/set` 让 App Server 发现仓库内的专用 fixture Skill。真实用户环境只做只读列举；`skills/config/write` 启停测试在临时 `CODEX_HOME` 中执行，测试先记录原状态，并在 `finally` 中恢复。恢复失败时能力验证必须失败并给出人工恢复命令。
 6. 使用 Codex SDK 执行一个无网络、无文件写入的提示，验证能够取得最终响应和线程标识。
 7. 将 Windows、Codex 版本、认证方式、实际可用方法和已知限制写入 `docs/compatibility.md`。
 

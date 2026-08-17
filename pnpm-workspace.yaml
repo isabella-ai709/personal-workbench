@@ -1,0 +1,4 @@
+allowBuilds:
+  esbuild: true
+ignoredOptionalDependencies:
+  - "@openai/codex-win32-x64"
