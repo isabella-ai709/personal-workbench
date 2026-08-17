@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:server": "tsx watch src/server/main.ts",
     "build": "pnpm typecheck && vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
@@ -18,12 +19,14 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "migrate": "tsx scripts/migrate.ts",
+    "start:server": "tsx src/server/main.ts",
     "verify:codex": "tsx scripts/verify-codex-capabilities.ts",
     "check": "pnpm typecheck && pnpm test --run && pnpm lint && pnpm format:check && pnpm build"
   },
   "dependencies": {
     "@openai/codex-sdk": "^0.147.0",
     "cron-parser": "^5.10.0",
+    "fastify": "^5.12.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zod": "^4.4.3"

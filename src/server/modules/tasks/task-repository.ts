@@ -6,6 +6,7 @@ import type {
   TaskRun,
   TaskRunStatus,
   TaskTrigger,
+  UpdateTaskInput,
 } from "../../../shared/contracts";
 import { WorkbenchError } from "../../../shared/errors";
 import type { WorkbenchDatabase } from "../../db/connection";
@@ -61,6 +62,14 @@ export interface CreateRunInput {
 export interface ClaimedTask {
   task: Task;
   run: TaskRun;
+}
+
+export interface ManualTaskClaim extends ClaimedTask {
+  created: boolean;
+}
+
+export interface UpdateTaskRecordInput extends UpdateTaskInput {
+  nextRunAt?: string | null;
 }
 
 export interface CompleteRunInput {
@@ -183,6 +192,33 @@ export class TaskRepository {
     if (result.changes === 0) throw new WorkbenchError("NOT_FOUND", "Task not found", 404);
   }
 
+  updateTask(id: string, input: UpdateTaskRecordInput): Task {
+    const current = this.getTask(id);
+    const schedule = input.schedule ?? current.schedule;
+    try {
+      this.database
+        .prepare(
+          `UPDATE tasks SET
+             name = ?, prompt = ?, cron_expression = ?, timezone = ?, enabled = ?,
+             next_run_at = ?, updated_at = ?
+           WHERE id = ? AND deleted_at IS NULL`,
+        )
+        .run(
+          input.name ?? current.name,
+          input.prompt ?? current.prompt,
+          schedule.cron,
+          schedule.timezone,
+          (input.enabled ?? current.enabled) ? 1 : 0,
+          input.nextRunAt === undefined ? current.nextRunAt : input.nextRunAt,
+          this.now(),
+          id,
+        );
+    } catch (error) {
+      databaseConflict(error, "An active task with this name already exists");
+    }
+    return this.getTask(id);
+  }
+
   softDeleteTask(id: string): Task {
     const timestamp = this.now();
     const result = this.database
@@ -245,12 +281,101 @@ export class TaskRepository {
     return mapRun(row);
   }
 
+  getRunLogPath(id: string): string | null {
+    const row = this.database.prepare("SELECT log_path FROM task_runs WHERE id = ?").get(id) as
+      { log_path: string | null } | undefined;
+    if (!row) throw new WorkbenchError("NOT_FOUND", "Task run not found", 404);
+    return row.log_path;
+  }
+
+  findRunByIdempotencyKey(idempotencyKey: string): TaskRun | null {
+    const row = this.database
+      .prepare("SELECT * FROM task_runs WHERE idempotency_key = ?")
+      .get(idempotencyKey) as TaskRunRow | undefined;
+    return row ? mapRun(row) : null;
+  }
+
   listRuns(taskId: string): TaskRun[] {
     return (
       this.database
         .prepare("SELECT * FROM task_runs WHERE task_id = ? ORDER BY created_at DESC")
         .all(taskId) as unknown as TaskRunRow[]
     ).map(mapRun);
+  }
+
+  listRunsPage(
+    taskId: string,
+    limit: number,
+    cursor?: string,
+  ): { items: TaskRun[]; nextCursor: string | null } {
+    const [cursorTime, cursorId] = cursor ? cursor.split("|") : [undefined, undefined];
+    if (cursor && (!cursorTime || !cursorId)) {
+      throw new WorkbenchError("VALIDATION_ERROR", "Invalid run history cursor", 400);
+    }
+    const rows = this.database
+      .prepare(
+        `SELECT * FROM task_runs
+         WHERE task_id = ? AND (
+           ? IS NULL OR created_at < ? OR (created_at = ? AND id < ?)
+         )
+         ORDER BY created_at DESC, id DESC
+         LIMIT ?`,
+      )
+      .all(
+        taskId,
+        cursorTime ?? null,
+        cursorTime ?? null,
+        cursorTime ?? null,
+        cursorId ?? null,
+        limit + 1,
+      ) as unknown as TaskRunRow[];
+    const items = rows.slice(0, limit).map(mapRun);
+    const lastItem = rows.slice(0, limit).at(-1);
+    return {
+      items,
+      nextCursor: rows.length > limit && lastItem ? `${lastItem.created_at}|${lastItem.id}` : null,
+    };
+  }
+
+  claimManualTask(
+    taskId: string,
+    idempotencyKey: string,
+    runId = randomUUID(),
+    retriedFromRunId?: string | null,
+  ): ManualTaskClaim {
+    this.database.exec("BEGIN IMMEDIATE");
+    try {
+      const existing = this.findRunByIdempotencyKey(idempotencyKey);
+      if (existing) {
+        const task = this.getTask(existing.taskId, true);
+        this.database.exec("COMMIT");
+        return { task, run: existing, created: false };
+      }
+      const task = this.getTask(taskId);
+      const now = this.now();
+      this.database
+        .prepare(
+          `INSERT INTO task_runs (
+             id, task_id, status, trigger, scheduled_for, started_at, finished_at,
+             duration_ms, result_preview, log_path, error_code, error_message,
+             codex_thread_id, idempotency_key, retried_from_run_id, created_at
+           ) VALUES (?, ?, 'running', ?, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, ?, ?)`,
+        )
+        .run(
+          runId,
+          taskId,
+          retriedFromRunId ? "retry" : "manual",
+          now,
+          idempotencyKey,
+          retriedFromRunId ?? null,
+          now,
+        );
+      this.database.exec("COMMIT");
+      return { task, run: this.getRun(runId), created: true };
+    } catch (error) {
+      this.database.exec("ROLLBACK");
+      databaseConflict(error, "This task already has an active run");
+    }
   }
 
   completeRun(id: string, input: CompleteRunInput): TaskRun {

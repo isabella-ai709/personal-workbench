@@ -2,7 +2,12 @@ import { CronExpressionParser } from "cron-parser";
 
 import type { Task, TaskRun, TaskSchedule } from "../../../shared/contracts";
 import { WorkbenchError } from "../../../shared/errors";
-import type { ClaimedTask, CompleteRunInput, CreateRunInput } from "./task-repository";
+import type {
+  ClaimedTask,
+  CompleteRunInput,
+  CreateRunInput,
+  ManualTaskClaim,
+} from "./task-repository";
 
 export interface SchedulerRepository {
   claimNextDueTask(now: string): ClaimedTask | null;
@@ -11,6 +16,13 @@ export interface SchedulerRepository {
   failInterruptedRuns(finishedAt: string): number;
   listEnabledTasks(): Task[];
   createRun(input: CreateRunInput): TaskRun;
+  findRunByIdempotencyKey(idempotencyKey: string): TaskRun | null;
+  claimManualTask(
+    taskId: string,
+    idempotencyKey: string,
+    runId?: string,
+    retriedFromRunId?: string | null,
+  ): ManualTaskClaim;
 }
 
 export interface TaskExecutionResult {
@@ -168,6 +180,39 @@ export class TaskScheduler {
       if (this.currentExecution === execution) this.currentExecution = null;
     }
     return true;
+  }
+
+  runTaskNow(taskId: string, idempotencyKey: string, retriedFromRunId?: string): TaskRun {
+    const existing = this.repository.findRunByIdempotencyKey(idempotencyKey);
+    if (existing) {
+      if (existing.taskId !== taskId) {
+        throw new WorkbenchError("CONFLICT", "Idempotency key belongs to another task", 409);
+      }
+      return existing;
+    }
+    if (this.currentExecution) {
+      throw new WorkbenchError("CONFLICT", "Another task is currently running", 409);
+    }
+    const claim = this.repository.claimManualTask(
+      taskId,
+      idempotencyKey,
+      undefined,
+      retriedFromRunId,
+    );
+    if (!claim.created) return claim.run;
+
+    const execution = this.executeClaim(claim);
+    this.currentExecution = execution;
+    void execution.then(
+      () => {
+        if (this.currentExecution === execution) this.currentExecution = null;
+      },
+      (error: unknown) => {
+        this.lastPollError = error instanceof Error ? error : new Error(String(error));
+        if (this.currentExecution === execution) this.currentExecution = null;
+      },
+    );
+    return claim.run;
   }
 
   private async executeClaim(claim: ClaimedTask): Promise<void> {

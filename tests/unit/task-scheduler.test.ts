@@ -85,6 +85,8 @@ describe("TaskScheduler", () => {
       failInterruptedRuns: () => 0,
       listEnabledTasks: () => [],
       createRun: () => run,
+      findRunByIdempotencyKey: () => null,
+      claimManualTask: () => ({ task, run, created: true }),
     } satisfies SchedulerRepository;
     const scheduler = new TaskScheduler(
       repository,
@@ -131,6 +133,8 @@ describe("TaskScheduler", () => {
       failInterruptedRuns: () => 0,
       listEnabledTasks: () => [],
       createRun: () => run,
+      findRunByIdempotencyKey: () => null,
+      claimManualTask: () => ({ task, run, created: true }),
     } satisfies SchedulerRepository;
     const scheduler = new TaskScheduler(repository, executor, undefined, fakeClock());
 
@@ -152,6 +156,8 @@ describe("TaskScheduler", () => {
       failInterruptedRuns: () => 0,
       listEnabledTasks: () => [],
       createRun: () => run,
+      findRunByIdempotencyKey: () => null,
+      claimManualTask: () => ({ task, run, created: true }),
     } satisfies SchedulerRepository;
     const scheduler = new TaskScheduler(
       repository,

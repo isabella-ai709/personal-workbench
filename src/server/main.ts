@@ -1,0 +1,32 @@
+import { buildApp } from "./app";
+import { loadServerConfig } from "./config";
+import { openDatabase } from "./db/connection";
+import { migrateDatabase } from "./db/migrate";
+import { CodexTaskExecutor } from "./integrations/codex/codex-task-executor";
+import { TaskRepository } from "./modules/tasks/task-repository";
+import { TaskScheduler } from "./modules/tasks/task-scheduler";
+import { TaskService } from "./modules/tasks/task-service";
+
+const config = loadServerConfig();
+const database = openDatabase(config.databasePath);
+migrateDatabase(database);
+const repository = new TaskRepository(database);
+const executor = new CodexTaskExecutor({
+  workingDirectory: config.workingDirectory,
+  logsDirectory: config.logsDirectory,
+});
+const scheduler = new TaskScheduler(repository, executor);
+const service = new TaskService(repository, scheduler, undefined, undefined, config.logsDirectory);
+const app = buildApp(service);
+
+const shutdown = async () => {
+  await scheduler.stop();
+  await app.close();
+  database.close();
+};
+process.once("SIGINT", () => void shutdown());
+process.once("SIGTERM", () => void shutdown());
+
+scheduler.start();
+await app.listen({ host: config.host, port: config.port });
+process.stdout.write(`Personal Workbench API listening on http://${config.host}:${config.port}\n`);
