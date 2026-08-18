@@ -10,7 +10,6 @@ import {
   resolveCodexExecutable,
   type SkillMetadata,
 } from "../src/server/integrations/codex/app-server-client";
-import { CodexTaskExecutor } from "../src/server/integrations/codex/codex-task-executor";
 
 const execFileAsync = promisify(execFile);
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,8 +25,6 @@ export interface CapabilityReport {
   installedSkillNames: string[];
   fixtureSkillPath: string;
   fixtureToggleRestored: boolean;
-  sdkThreadId: string;
-  sdkFinalResponse: string;
 }
 
 function flattenSkills(response: { data: Array<{ skills: SkillMetadata[] }> }): SkillMetadata[] {
@@ -123,10 +120,6 @@ export async function verifyCodexCapabilities(): Promise<CapabilityReport> {
   }
   if (!restored || !fixtureSkill) throw new Error("Fixture Skill state was not restored");
 
-  const sdkResult = await new CodexTaskExecutor({
-    workingDirectory: projectRoot,
-    codexPath: codexExecutable,
-  }).verifyExecution();
   return {
     codexVersion: versionOutput.trim(),
     codexExecutable,
@@ -139,8 +132,6 @@ export async function verifyCodexCapabilities(): Promise<CapabilityReport> {
       .slice(0, 20),
     fixtureSkillPath: fixtureSkill.path,
     fixtureToggleRestored: restored,
-    sdkThreadId: sdkResult.threadId,
-    sdkFinalResponse: sdkResult.finalResponse,
   };
 }
 

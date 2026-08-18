@@ -1,86 +1,8 @@
 import { z } from "zod";
 
-import { assertRunTimeline } from "./task-state";
+import { taskPlanSchema } from "./task-plan-contracts";
 
 export const WORKBENCH_NAME = "个人 Codex 工作台";
-
-export const taskRunStatusSchema = z.enum([
-  "pending",
-  "running",
-  "succeeded",
-  "failed",
-  "cancelled",
-  "missed",
-]);
-export type TaskRunStatus = z.infer<typeof taskRunStatusSchema>;
-
-export const taskTriggerSchema = z.enum(["scheduled", "manual", "retry", "recovery"]);
-export type TaskTrigger = z.infer<typeof taskTriggerSchema>;
-
-const identifierSchema = z.string().uuid();
-const timestampSchema = z.iso.datetime({ offset: true });
-const nullableTimestampSchema = timestampSchema.nullable();
-
-export const taskScheduleSchema = z.object({
-  cron: z.string().trim().min(1).max(120),
-  timezone: z.string().trim().min(1).max(120),
-});
-export type TaskSchedule = z.infer<typeof taskScheduleSchema>;
-
-export const taskSchema = z.object({
-  id: identifierSchema,
-  name: z.string().trim().min(1).max(120),
-  prompt: z.string().trim().min(1).max(20_000),
-  schedule: taskScheduleSchema,
-  enabled: z.boolean(),
-  nextRunAt: nullableTimestampSchema,
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
-  deletedAt: nullableTimestampSchema,
-});
-export type Task = z.infer<typeof taskSchema>;
-
-export const createTaskInputSchema = taskSchema
-  .pick({ name: true, prompt: true, schedule: true })
-  .extend({ enabled: z.boolean().default(true) });
-export type CreateTaskInput = z.input<typeof createTaskInputSchema>;
-
-export const updateTaskInputSchema = taskSchema
-  .pick({ name: true, prompt: true, schedule: true, enabled: true })
-  .partial()
-  .refine((value) => Object.keys(value).length > 0, "At least one task field is required");
-export type UpdateTaskInput = z.infer<typeof updateTaskInputSchema>;
-
-export const taskRunSchema = z
-  .object({
-    id: identifierSchema,
-    taskId: identifierSchema,
-    status: taskRunStatusSchema,
-    trigger: taskTriggerSchema,
-    scheduledFor: nullableTimestampSchema,
-    startedAt: nullableTimestampSchema,
-    finishedAt: nullableTimestampSchema,
-    durationMs: z.number().int().nonnegative().nullable(),
-    resultPreview: z.string().max(4_000).nullable(),
-    errorCode: z.string().max(120).nullable(),
-    errorMessage: z.string().max(2_000).nullable(),
-    codexThreadId: z.string().max(200).nullable(),
-    hasFullLog: z.boolean(),
-    retriedFromRunId: identifierSchema.nullable(),
-    createdAt: timestampSchema,
-  })
-  .superRefine((run, context) => {
-    try {
-      assertRunTimeline(run);
-    } catch (error) {
-      context.addIssue({
-        code: "custom",
-        message: error instanceof Error ? error.message : "Invalid task run timeline",
-        path: ["status"],
-      });
-    }
-  });
-export type TaskRun = z.infer<typeof taskRunSchema>;
 
 export const skillOriginSchema = z.enum([
   "system",
@@ -107,18 +29,18 @@ export const skillSummarySchema = z.object({
 export type SkillSummary = z.infer<typeof skillSummarySchema>;
 
 export const dashboardSummarySchema = z.object({
-  tasks: z.object({
-    total: z.number().int().nonnegative(),
-    enabled: z.number().int().nonnegative(),
-    paused: z.number().int().nonnegative(),
-    failedRuns: z.number().int().nonnegative(),
+  plans: z.object({
+    pastPlanTime: z.number().int().nonnegative(),
+    today: z.number().int().nonnegative(),
+    inProgress: z.number().int().nonnegative(),
+    blocked: z.number().int().nonnegative(),
   }),
   skills: z.object({
     total: z.number().int().nonnegative(),
     enabled: z.number().int().nonnegative(),
     stale: z.boolean(),
   }),
-  recentRuns: z.array(taskRunSchema.extend({ taskName: z.string().min(1).max(120) })),
+  recentIdeas: z.array(taskPlanSchema),
 });
 export type DashboardSummary = z.infer<typeof dashboardSummarySchema>;
 

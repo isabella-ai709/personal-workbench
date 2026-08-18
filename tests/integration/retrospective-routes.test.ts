@@ -5,9 +5,6 @@ import { openDatabase, type WorkbenchDatabase } from "../../src/server/db/connec
 import { migrateDatabase } from "../../src/server/db/migrate";
 import { RetrospectiveRepository } from "../../src/server/modules/retrospectives/retrospective-repository";
 import { RetrospectiveService } from "../../src/server/modules/retrospectives/retrospective-service";
-import { TaskRepository } from "../../src/server/modules/tasks/task-repository";
-import { TaskScheduler } from "../../src/server/modules/tasks/task-scheduler";
-import { TaskService } from "../../src/server/modules/tasks/task-service";
 
 const resources: Array<{ app: ReturnType<typeof buildApp>; database: WorkbenchDatabase }> = [];
 
@@ -22,14 +19,9 @@ function setup() {
   const database = openDatabase(":memory:");
   migrateDatabase(database);
   let now = "2026-08-18T08:00:00.000Z";
-  const taskRepository = new TaskRepository(database);
-  const scheduler = new TaskScheduler(taskRepository, {
-    execute: async () => ({ resultPreview: "", codexThreadId: null, logPath: null }),
-  });
-  const taskService = new TaskService(taskRepository, scheduler);
   const retrospectiveRepository = new RetrospectiveRepository(database, () => now);
   const app = buildApp(
-    taskService,
+    undefined,
     undefined,
     undefined,
     undefined,

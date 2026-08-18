@@ -1,17 +1,17 @@
 import {
   dashboardSummarySchema,
-  paginatedSchema,
   skillSummarySchema,
-  taskRunSchema,
-  taskSchema,
-  type CreateTaskInput,
   type DashboardSummary,
   type SkillOrigin,
   type SkillSummary,
-  type Task,
-  type TaskRun,
-  type UpdateTaskInput,
 } from "../../shared/contracts";
+import {
+  taskPlanSchema,
+  type CreateTaskPlanInput,
+  type TaskPlan,
+  type TaskPlanStatus,
+  type UpdateTaskPlanInput,
+} from "../../shared/task-plan-contracts";
 import { z } from "zod";
 
 interface ErrorEnvelope {
@@ -74,58 +74,45 @@ export async function getDashboard(): Promise<DashboardSummary> {
   return dashboardSummarySchema.parse(await apiRequest<unknown>("/api/dashboard"));
 }
 
-export async function getTasks(includeDeleted = false): Promise<Task[]> {
-  const payload = await apiRequest<unknown>(`/api/tasks?includeDeleted=${String(includeDeleted)}`);
-  return taskSchema.array().parse((payload as { items?: unknown }).items);
+export async function getTaskPlans(includeDeleted = false): Promise<TaskPlan[]> {
+  const payload = await apiRequest<unknown>(
+    `/api/task-plans?includeDeleted=${String(includeDeleted)}`,
+  );
+  return taskPlanSchema.array().parse((payload as { items?: unknown }).items);
 }
 
-export async function createTask(input: CreateTaskInput): Promise<Task> {
-  return taskSchema.parse(
-    await apiRequest("/api/tasks", { method: "POST", body: JSON.stringify(input) }),
+export async function createTaskPlan(input: CreateTaskPlanInput): Promise<TaskPlan> {
+  return taskPlanSchema.parse(
+    await apiRequest("/api/task-plans", { method: "POST", body: JSON.stringify(input) }),
   );
 }
 
-export async function updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
-  return taskSchema.parse(
-    await apiRequest(`/api/tasks/${id}`, { method: "PATCH", body: JSON.stringify(input) }),
-  );
-}
-
-export async function setTaskEnabled(id: string, enabled: boolean): Promise<Task> {
-  return taskSchema.parse(
-    await apiRequest(`/api/tasks/${id}/${enabled ? "enable" : "pause"}`, { method: "POST" }),
-  );
-}
-
-export async function runTask(id: string, retriedFromRunId?: string): Promise<TaskRun> {
-  return taskRunSchema.parse(
-    await apiRequest(`/api/tasks/${id}/run`, {
-      method: "POST",
-      headers: { "idempotency-key": crypto.randomUUID() },
-      body: JSON.stringify(retriedFromRunId ? { retriedFromRunId } : {}),
+export async function updateTaskPlan(id: string, input: UpdateTaskPlanInput): Promise<TaskPlan> {
+  return taskPlanSchema.parse(
+    await apiRequest(`/api/task-plans/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
     }),
   );
 }
 
-export async function deleteTask(id: string): Promise<Task> {
-  return taskSchema.parse(await apiRequest(`/api/tasks/${id}`, { method: "DELETE" }));
+export async function setTaskPlanStatus(id: string, status: TaskPlanStatus): Promise<TaskPlan> {
+  return taskPlanSchema.parse(
+    await apiRequest(`/api/task-plans/${id}/status`, {
+      method: "POST",
+      body: JSON.stringify({ status }),
+    }),
+  );
 }
 
-export async function restoreTask(id: string): Promise<Task> {
-  return taskSchema.parse(await apiRequest(`/api/tasks/${id}/restore`, { method: "POST" }));
+export async function deleteTaskPlan(id: string): Promise<TaskPlan> {
+  return taskPlanSchema.parse(await apiRequest(`/api/task-plans/${id}`, { method: "DELETE" }));
 }
 
-export async function getTaskRuns(taskId: string): Promise<TaskRun[]> {
-  const schema = paginatedSchema(taskRunSchema);
-  return schema.parse(await apiRequest(`/api/tasks/${taskId}/runs?limit=100`)).items;
-}
-
-export async function getRunLog(runId: string): Promise<string> {
-  const response = await fetch(`/api/runs/${runId}/log`, {
-    headers: { accept: "application/x-ndjson" },
-  });
-  if (!response.ok) throw new ApiClientError("完整日志暂时无法读取", response.status);
-  return response.text();
+export async function restoreTaskPlan(id: string): Promise<TaskPlan> {
+  return taskPlanSchema.parse(
+    await apiRequest(`/api/task-plans/${id}/restore`, { method: "POST" }),
+  );
 }
 
 export interface SkillDetail extends SkillSummary {

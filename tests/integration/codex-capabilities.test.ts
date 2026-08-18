@@ -5,12 +5,11 @@ import { verifyCodexCapabilities } from "../../scripts/verify-codex-capabilities
 const runRealIntegration = process.env.RUN_CODEX_INTEGRATION === "1";
 
 describe.skipIf(!runRealIntegration)("local Codex capabilities", () => {
-  it("lists Skills, safely toggles an isolated fixture, and executes an SDK turn", async () => {
+  it("lists Skills and safely toggles an isolated fixture", async () => {
     const report = await verifyCodexCapabilities();
 
     expect(report.codexVersion).toMatch(/codex/i);
     expect(report.fixtureToggleRestored).toBe(true);
-    expect(report.sdkThreadId).not.toBe("");
-    expect(report.sdkFinalResponse).toContain("WORKBENCH_CODEX_OK");
+    expect(report.installedSkillCount).toBeGreaterThanOrEqual(0);
   }, 300_000);
 });

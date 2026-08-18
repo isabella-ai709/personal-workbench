@@ -6,9 +6,6 @@ import { migrateDatabase } from "../../src/server/db/migrate";
 import { BusinessRepository } from "../../src/server/modules/business/business-repository";
 import { BusinessService } from "../../src/server/modules/business/business-service";
 import { BusinessAiService } from "../../src/server/modules/business/business-ai";
-import { TaskRepository } from "../../src/server/modules/tasks/task-repository";
-import { TaskScheduler } from "../../src/server/modules/tasks/task-scheduler";
-import { TaskService } from "../../src/server/modules/tasks/task-service";
 
 const now = "2026-08-18T03:00:00.000Z";
 const resources: Array<{ app: ReturnType<typeof buildApp>; database: WorkbenchDatabase }> = [];
@@ -23,13 +20,6 @@ afterEach(async () => {
 function setup() {
   const database = openDatabase(":memory:");
   migrateDatabase(database);
-  const taskRepository = new TaskRepository(database, () => now);
-  const taskService = new TaskService(
-    taskRepository,
-    new TaskScheduler(taskRepository, {
-      execute: async () => ({ resultPreview: "ok", codexThreadId: null, logPath: null }),
-    }),
-  );
   const businessRepository = new BusinessRepository(database, () => now);
   const business = new BusinessService(businessRepository, () => new Date(now));
   const businessAi = new BusinessAiService(businessRepository, {
@@ -41,7 +31,7 @@ function setup() {
       nextActions: [{ title: "周五确认名单", dueAt: "2026-08-21T09:00:00.000Z" }],
     }),
   });
-  const app = buildApp(taskService, undefined, undefined, undefined, business, businessAi);
+  const app = buildApp(undefined, undefined, undefined, undefined, business, businessAi);
   resources.push({ app, database });
   return { app, database };
 }

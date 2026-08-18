@@ -4,7 +4,6 @@ export interface ServerConfig {
   host: string;
   port: number;
   databasePath: string;
-  logsDirectory: string;
   workingDirectory: string;
 }
 
@@ -22,7 +21,6 @@ export function loadServerConfig(environment: NodeJS.ProcessEnv = process.env): 
     host,
     port,
     databasePath: resolve(environment.WORKBENCH_DATABASE_PATH ?? "data/workbench.sqlite"),
-    logsDirectory: resolve(environment.WORKBENCH_LOGS_DIRECTORY ?? "logs"),
     workingDirectory,
   };
 }

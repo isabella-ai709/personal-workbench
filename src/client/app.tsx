@@ -6,8 +6,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { WorkbenchLayout } from "./layouts/workbench-layout";
 import { DashboardPage } from "./pages/dashboard-page";
 
-const TasksPage = lazy(() =>
-  import("./pages/tasks-page").then((module) => ({ default: module.TasksPage })),
+const TaskPlansPage = lazy(() =>
+  import("./pages/task-plans-page").then((module) => ({ default: module.TaskPlansPage })),
 );
 const SkillsPage = lazy(() =>
   import("./pages/skills-page").then((module) => ({ default: module.SkillsPage })),
@@ -35,8 +35,8 @@ export function App() {
             <Route
               path="tasks"
               element={
-                <Suspense fallback={<div className="page-loading">正在加载任务日志</div>}>
-                  <TasksPage />
+                <Suspense fallback={<div className="page-loading">正在加载任务计划</div>}>
+                  <TaskPlansPage />
                 </Suspense>
               }
             />

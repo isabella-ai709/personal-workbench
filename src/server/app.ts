@@ -11,12 +11,12 @@ import { registerDashboardRoutes } from "./modules/dashboard/dashboard-routes";
 import type { DashboardService } from "./modules/dashboard/dashboard-service";
 import { registerSkillRoutes } from "./modules/skills/skill-routes";
 import type { SkillService } from "./modules/skills/skill-service";
-import { registerTaskRoutes } from "./modules/tasks/task-routes";
-import type { TaskService } from "./modules/tasks/task-service";
+import { registerTaskPlanRoutes } from "./modules/task-plans/task-plan-routes";
+import type { TaskPlanService } from "./modules/task-plans/task-plan-service";
 import type { LocalSession } from "./security/local-session";
 
 export function buildApp(
-  taskService: TaskService,
+  taskPlanService?: TaskPlanService,
   skillService?: SkillService,
   localSession?: LocalSession,
   dashboardService?: DashboardService,
@@ -26,7 +26,7 @@ export function buildApp(
 ): FastifyInstance {
   const app = Fastify({ logger: false });
   localSession?.register(app);
-  registerTaskRoutes(app, taskService);
+  if (taskPlanService) registerTaskPlanRoutes(app, taskPlanService);
   if (skillService) registerSkillRoutes(app, skillService);
   if (dashboardService) registerDashboardRoutes(app, dashboardService);
   if (businessService) registerBusinessRoutes(app, businessService, businessAiService);

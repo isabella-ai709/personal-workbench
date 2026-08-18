@@ -33,6 +33,7 @@ describe("database migrations", () => {
       "002_skill_cache.sql",
       "003_business_workbench.sql",
       "004_retrospectives.sql",
+      "005_task_plans.sql",
     ]);
     expect(migrateDatabase(database)).toEqual([]);
     const tables = database
@@ -41,8 +42,7 @@ describe("database migrations", () => {
     expect(tables.map((table) => table.name)).toEqual(
       expect.arrayContaining([
         "schema_migrations",
-        "tasks",
-        "task_runs",
+        "task_plans",
         "skill_origin_overrides",
         "settings",
         "skill_cache",
@@ -56,6 +56,9 @@ describe("database migrations", () => {
         "business_ai_drafts",
         "retrospectives",
       ]),
+    );
+    expect(tables.map((table) => table.name)).not.toEqual(
+      expect.arrayContaining(["tasks", "task_runs"]),
     );
     expect(database.prepare("PRAGMA foreign_keys").get()).toEqual({ foreign_keys: 1 });
   });

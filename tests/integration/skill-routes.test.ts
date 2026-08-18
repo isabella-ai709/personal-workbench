@@ -11,7 +11,6 @@ import type { FolderOpener, RecycleBin } from "../../src/server/integrations/win
 import { SkillCacheRepository } from "../../src/server/modules/skills/skill-cache-repository";
 import { SkillOriginRepository } from "../../src/server/modules/skills/skill-origin-repository";
 import { SkillService } from "../../src/server/modules/skills/skill-service";
-import type { TaskService } from "../../src/server/modules/tasks/task-service";
 
 class FakeGateway implements SkillGateway {
   unavailable = false;
@@ -83,7 +82,7 @@ function setup(scope: SkillMetadata["scope"] = "user") {
     recycleBin,
     () => "2026-08-17T00:00:00.000Z",
   );
-  const app = buildApp({} as TaskService, service);
+  const app = buildApp(undefined, service);
   resources.push({ app, database });
   return { app, gateway, folder, recycleBin };
 }

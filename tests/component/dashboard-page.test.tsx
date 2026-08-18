@@ -31,9 +31,9 @@ class ResizeObserverStub {
 Object.defineProperty(window, "ResizeObserver", { value: ResizeObserverStub, configurable: true });
 
 const summary: DashboardSummary = {
-  tasks: { total: 3, enabled: 2, paused: 1, failedRuns: 1 },
+  plans: { pastPlanTime: 3, today: 2, inProgress: 1, blocked: 1 },
   skills: { total: 8, enabled: 6, stale: false },
-  recentRuns: [],
+  recentIdeas: [],
 };
 
 afterEach(() => {
@@ -53,14 +53,14 @@ function renderPage() {
 }
 
 describe("dashboard page", () => {
-  it("renders source-backed task and Skill statistics", async () => {
+  it("renders source-backed task plan and Skill statistics", async () => {
     vi.mocked(getDashboard).mockResolvedValue(summary);
     renderPage();
     expect(screen.getByLabelText("正在加载首页")).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "首页" })).toBeInTheDocument();
+    expect(screen.getByText("计划时间已过")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText("共发现 8 个")).toBeInTheDocument();
-    expect(screen.getByText("还没有运行记录。创建任务后，结果会显示在这里。")).toBeInTheDocument();
+    expect(screen.getByText(/还没有记录想法/)).toBeInTheDocument();
   });
 
   it("makes stale Skill data explicit", async () => {

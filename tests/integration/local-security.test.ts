@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { buildApp } from "../../src/server/app";
 import { isLoopbackHost, loadServerConfig, serverOrigin } from "../../src/server/config";
-import type { TaskService } from "../../src/server/modules/tasks/task-service";
+import type { TaskPlanService } from "../../src/server/modules/task-plans/task-plan-service";
 import { LocalSession } from "../../src/server/security/local-session";
 
 const origin = "http://127.0.0.1:4310";
@@ -14,10 +14,10 @@ afterEach(async () => {
 });
 
 function setup() {
-  const taskService = {
+  const taskPlanService = {
     create: () => ({ id: "task-created" }),
-  } as unknown as TaskService;
-  const app = buildApp(taskService, undefined, new LocalSession({ origin, token }));
+  } as unknown as TaskPlanService;
+  const app = buildApp(taskPlanService, undefined, new LocalSession({ origin, token }));
   apps.push(app);
   return app;
 }
@@ -61,12 +61,10 @@ describe("localhost security", () => {
     const request = (headers: Record<string, string>) =>
       app.inject({
         method: "POST",
-        url: "/api/tasks",
+        url: "/api/task-plans",
         headers,
         payload: {
-          name: "test",
-          prompt: "test",
-          schedule: { cron: "0 1 * * *", timezone: "Asia/Shanghai" },
+          title: "test",
         },
       });
 
