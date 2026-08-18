@@ -28,7 +28,11 @@ describe("database migrations", () => {
     temporaryDirectories.push(directory);
     database = openDatabase(join(directory, "workbench.sqlite"));
 
-    expect(migrateDatabase(database)).toEqual(["001_initial.sql", "002_skill_cache.sql"]);
+    expect(migrateDatabase(database)).toEqual([
+      "001_initial.sql",
+      "002_skill_cache.sql",
+      "003_business_workbench.sql",
+    ]);
     expect(migrateDatabase(database)).toEqual([]);
     const tables = database
       .prepare("SELECT name FROM sqlite_master WHERE type = 'table'")
@@ -41,6 +45,14 @@ describe("database migrations", () => {
         "skill_origin_overrides",
         "settings",
         "skill_cache",
+        "business_companies",
+        "business_contacts",
+        "business_opportunities",
+        "business_partnerships",
+        "business_activities",
+        "business_follow_ups",
+        "business_events",
+        "business_ai_drafts",
       ]),
     );
     expect(database.prepare("PRAGMA foreign_keys").get()).toEqual({ foreign_keys: 1 });

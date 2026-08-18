@@ -6,6 +6,9 @@ import { CodexTaskExecutor } from "./integrations/codex/codex-task-executor";
 import { CodexSkillGateway } from "./integrations/codex/skill-gateway";
 import { WindowsFolderOpener, WindowsRecycleBin } from "./integrations/windows-shell";
 import { DashboardService } from "./modules/dashboard/dashboard-service";
+import { BusinessRepository } from "./modules/business/business-repository";
+import { BusinessService } from "./modules/business/business-service";
+import { BusinessAiService, CodexBusinessAiExtractor } from "./modules/business/business-ai";
 import { SkillCacheRepository } from "./modules/skills/skill-cache-repository";
 import { SkillOriginRepository } from "./modules/skills/skill-origin-repository";
 import { SkillService } from "./modules/skills/skill-service";
@@ -25,6 +28,7 @@ const executor = new CodexTaskExecutor({
 });
 const scheduler = new TaskScheduler(repository, executor);
 const service = new TaskService(repository, scheduler, undefined, undefined, config.logsDirectory);
+const businessRepository = new BusinessRepository(database);
 const skillService = new SkillService(
   new CodexSkillGateway({ cwd: config.workingDirectory }),
   new SkillOriginRepository(database),
@@ -37,6 +41,11 @@ const app = buildApp(
   skillService,
   new LocalSession({ origin: serverOrigin(config) }),
   new DashboardService(repository, skillService),
+  new BusinessService(businessRepository),
+  new BusinessAiService(
+    businessRepository,
+    new CodexBusinessAiExtractor({ workingDirectory: config.workingDirectory }),
+  ),
 );
 
 const shutdown = async () => {

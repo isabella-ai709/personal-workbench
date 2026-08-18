@@ -12,6 +12,9 @@ const TasksPage = lazy(() =>
 const SkillsPage = lazy(() =>
   import("./pages/skills-page").then((module) => ({ default: module.SkillsPage })),
 );
+const BusinessPage = lazy(() =>
+  import("./pages/business-page").then((module) => ({ default: module.BusinessPage })),
+);
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false } },
@@ -37,6 +40,14 @@ export function App() {
               element={
                 <Suspense fallback={<div className="page-loading">正在加载 Skill 管理</div>}>
                   <SkillsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="business"
+              element={
+                <Suspense fallback={<div className="page-loading">正在加载商务对接</div>}>
+                  <BusinessPage />
                 </Suspense>
               }
             />
