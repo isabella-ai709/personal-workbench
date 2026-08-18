@@ -19,6 +19,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "migrate": "tsx scripts/migrate.ts",
+    "cleanup": "tsx scripts/cleanup-retention.ts",
     "start:server": "tsx src/server/main.ts",
     "verify:codex": "tsx scripts/verify-codex-capabilities.ts",
     "check": "pnpm typecheck && pnpm test --run && pnpm lint && pnpm format:check && pnpm build"

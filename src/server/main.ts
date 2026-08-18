@@ -13,6 +13,7 @@ import { TaskRepository } from "./modules/tasks/task-repository";
 import { TaskScheduler } from "./modules/tasks/task-scheduler";
 import { TaskService } from "./modules/tasks/task-service";
 import { LocalSession } from "./security/local-session";
+import { cleanupRetention } from "./maintenance/retention";
 
 const config = loadServerConfig();
 const database = openDatabase(config.databasePath);
@@ -48,4 +49,19 @@ process.once("SIGTERM", () => void shutdown());
 
 scheduler.start();
 await app.listen({ host: config.host, port: config.port });
+const retentionResult = cleanupRetention(database);
+process.stdout.write(
+  `Retention cleanup: ${retentionResult.deletedRuns} runs, ${retentionResult.deletedTasks} deleted tasks\n`,
+);
+const retentionTimer = setInterval(
+  () => {
+    try {
+      cleanupRetention(database);
+    } catch (error) {
+      process.stderr.write(`Retention cleanup failed: ${String(error)}\n`);
+    }
+  },
+  6 * 60 * 60 * 1000,
+);
+retentionTimer.unref();
 process.stdout.write(`Personal Workbench API listening on http://${config.host}:${config.port}\n`);
