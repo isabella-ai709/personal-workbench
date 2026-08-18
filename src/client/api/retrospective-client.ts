@@ -2,6 +2,8 @@ import {
   retrospectiveSchema,
   type CreateRetrospectiveInput,
   type Retrospective,
+  retrospectiveAiAnalysisSchema,
+  type RetrospectiveAiAnalysis,
   type UpdateRetrospectiveInput,
 } from "../../shared/retrospective-contracts";
 import { apiRequest } from "./client";
@@ -35,5 +37,11 @@ export async function updateRetrospective(
 export async function deleteRetrospective(id: string): Promise<Retrospective> {
   return retrospectiveSchema.parse(
     await apiRequest(`/api/retrospectives/${id}`, { method: "DELETE" }),
+  );
+}
+
+export async function analyzeRetrospective(id: string): Promise<RetrospectiveAiAnalysis> {
+  return retrospectiveAiAnalysisSchema.parse(
+    await apiRequest(`/api/retrospectives/${id}/ai-analysis`, { method: "POST" }),
   );
 }

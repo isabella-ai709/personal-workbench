@@ -42,3 +42,13 @@ export const updateRetrospectiveInputSchema = editableFields
   .partial()
   .refine((value) => Object.keys(value).length > 0, "At least one field is required");
 export type UpdateRetrospectiveInput = z.infer<typeof updateRetrospectiveInputSchema>;
+
+export const retrospectiveAiAnalysisSchema = z.object({
+  retrospectiveId: z.string().uuid(),
+  summary: z.string().trim().max(20_000),
+  strengths: z.array(z.string().trim().max(2_000)).max(50),
+  issues: z.array(z.string().trim().max(2_000)).max(50),
+  suggestions: z.array(z.string().trim().max(2_000)).max(50),
+  nextActions: z.array(z.string().trim().max(2_000)).max(50),
+});
+export type RetrospectiveAiAnalysis = z.infer<typeof retrospectiveAiAnalysisSchema>;

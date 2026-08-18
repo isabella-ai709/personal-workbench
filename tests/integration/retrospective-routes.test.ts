@@ -109,4 +109,28 @@ describe("retrospective routes", () => {
     expect(missing.statusCode).toBe(404);
     expect(missing.json()).toMatchObject({ error: { code: "NOT_FOUND" } });
   });
+
+  it("reserves an AI analysis endpoint without changing the original record", async () => {
+    const { app } = setup();
+    const created = await app.inject({
+      method: "POST",
+      url: "/api/retrospectives",
+      payload: { title: "待分析复盘" },
+    });
+
+    const analysis = await app.inject({
+      method: "POST",
+      url: `/api/retrospectives/${created.json().id}/ai-analysis`,
+    });
+    expect(analysis.statusCode).toBe(503);
+    expect(analysis.json()).toMatchObject({
+      error: { message: "经验复盘 AI 分析尚未配置，请先配置 AI 服务" },
+    });
+
+    const unchanged = await app.inject({
+      method: "GET",
+      url: `/api/retrospectives/${created.json().id}`,
+    });
+    expect(unchanged.json()).toMatchObject({ title: "待分析复盘" });
+  });
 });

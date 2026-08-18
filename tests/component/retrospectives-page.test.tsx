@@ -77,6 +77,7 @@ vi.mock("@fluentui/react-components", () => {
 });
 
 vi.mock("../../src/client/api/retrospective-client", () => ({
+  analyzeRetrospective: vi.fn(),
   getRetrospectives: vi.fn(),
   createRetrospective: vi.fn(),
   updateRetrospective: vi.fn(),
@@ -158,5 +159,20 @@ describe("retrospectives page", () => {
     fireEvent.click(screen.getByRole("button", { name: "删除" }));
     expect(screen.getByText("删除这条复盘？")).toBeInTheDocument();
     expect(retrospectiveClient.deleteRetrospective).not.toHaveBeenCalled();
+  });
+
+  it("exposes the reserved AI analysis entry point", async () => {
+    vi.mocked(retrospectiveClient.getRetrospectives).mockResolvedValue([record]);
+    vi.mocked(retrospectiveClient.analyzeRetrospective).mockRejectedValue(
+      new ApiClientError("经验复盘 AI 分析尚未配置，请先配置 AI 服务", 503),
+    );
+    renderPage();
+
+    expect(await screen.findByRole("heading", { name: "客户沟通复盘" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "AI 分析" }));
+    expect(
+      await screen.findByText("经验复盘 AI 分析尚未配置，请先配置 AI 服务"),
+    ).toBeInTheDocument();
+    expect(retrospectiveClient.analyzeRetrospective).toHaveBeenCalledWith(record.id);
   });
 });

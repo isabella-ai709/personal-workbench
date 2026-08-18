@@ -1203,6 +1203,30 @@ textarea {
   color: var(--workbench-muted);
 }
 
+.retrospective-ai-analysis {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--workbench-border);
+  border-radius: var(--workbench-radius);
+  background: #f7fbff;
+}
+
+.retrospective-ai-analysis h3,
+.retrospective-ai-analysis h4 {
+  margin: 0 0 8px;
+}
+
+.retrospective-ai-analysis h4 {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.retrospective-ai-analysis p,
+.retrospective-ai-analysis ul {
+  margin: 0;
+  line-height: 1.6;
+}
+
 @media (max-width: 1060px) {
   .pipeline-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

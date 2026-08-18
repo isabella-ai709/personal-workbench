@@ -20,11 +20,13 @@ import { useEffect, useMemo, useState } from "react";
 import type { Retrospective } from "../../shared/retrospective-contracts";
 import { ApiClientError } from "../api/client";
 import {
+  analyzeRetrospective,
   createRetrospective,
   deleteRetrospective,
   getRetrospectives,
   updateRetrospective,
 } from "../api/retrospective-client";
+import type { RetrospectiveAiAnalysis } from "../../shared/retrospective-contracts";
 
 interface Draft {
   title: string;
@@ -82,6 +84,7 @@ export function RetrospectivesPage() {
   const [baseline, setBaseline] = useState<Draft>(emptyDraft);
   const [error, setError] = useState<string>();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<RetrospectiveAiAnalysis>();
 
   const selected = useMemo(
     () => records.data?.find((item) => item.id === selectedId),
@@ -142,6 +145,14 @@ export function RetrospectivesPage() {
       setError(errorMessage(cause));
     },
   });
+  const ai = useMutation({
+    mutationFn: () => analyzeRetrospective(selectedId as string),
+    onSuccess: (result) => {
+      setAiAnalysis(result);
+      setError(undefined);
+    },
+    onError: (cause) => setError(errorMessage(cause)),
+  });
 
   const canDiscard = () => !dirty || window.confirm("当前复盘尚未保存，确定放弃修改吗？");
   const startNew = () => {
@@ -150,6 +161,7 @@ export function RetrospectivesPage() {
     setDraft(emptyDraft);
     setBaseline(emptyDraft);
     setMode("new");
+    setAiAnalysis(undefined);
     setError(undefined);
   };
   const selectRecord = (item: Retrospective) => {
@@ -158,6 +170,7 @@ export function RetrospectivesPage() {
     setDraft(toDraft(item));
     setBaseline(toDraft(item));
     setMode("view");
+    setAiAnalysis(undefined);
     setError(undefined);
   };
   const startEdit = () => {
@@ -174,6 +187,7 @@ export function RetrospectivesPage() {
       setDraft(value);
       setBaseline(value);
       setMode("view");
+      setAiAnalysis(undefined);
     } else {
       setDraft(emptyDraft);
       setBaseline(emptyDraft);
@@ -320,6 +334,13 @@ export function RetrospectivesPage() {
                   ) : null}
                 </div>
                 <div className="retrospective-actions">
+                  <Button
+                    onClick={() => ai.mutate()}
+                    disabled={ai.isPending}
+                    title="调用预留的 AI 分析接口"
+                  >
+                    {ai.isPending ? "分析中" : "AI 分析"}
+                  </Button>
                   <Button icon={<Edit20Regular />} onClick={startEdit}>
                     编辑
                   </Button>
@@ -335,6 +356,7 @@ export function RetrospectivesPage() {
               </div>
               <RetrospectiveSection title="经验总结" content={selected.lesson} />
               <RetrospectiveSection title="下次改进" content={selected.nextImprovement} accent />
+              {aiAnalysis ? <RetrospectiveAnalysis analysis={aiAnalysis} /> : null}
             </article>
           ) : (
             <div className="retrospective-welcome">
@@ -386,5 +408,35 @@ function RetrospectiveSection({
       <h3>{title}</h3>
       <p>{content || "未填写"}</p>
     </section>
+  );
+}
+
+function RetrospectiveAnalysis({ analysis }: { analysis: RetrospectiveAiAnalysis }) {
+  return (
+    <section className="retrospective-ai-analysis" aria-label="AI 分析结果">
+      <h3>AI 分析结果</h3>
+      <p>{analysis.summary || "未生成总结"}</p>
+      <AnalysisList title="做得好的地方" items={analysis.strengths} />
+      <AnalysisList title="问题模式" items={analysis.issues} />
+      <AnalysisList title="改进建议" items={analysis.suggestions} />
+      <AnalysisList title="下一步行动" items={analysis.nextActions} />
+    </section>
+  );
+}
+
+function AnalysisList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div>
+      <h4>{title}</h4>
+      {items.length ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>未识别</p>
+      )}
+    </div>
   );
 }
