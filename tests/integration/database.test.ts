@@ -32,6 +32,7 @@ describe("database migrations", () => {
       "001_initial.sql",
       "002_skill_cache.sql",
       "003_business_workbench.sql",
+      "004_retrospectives.sql",
     ]);
     expect(migrateDatabase(database)).toEqual([]);
     const tables = database
@@ -53,6 +54,7 @@ describe("database migrations", () => {
         "business_follow_ups",
         "business_events",
         "business_ai_drafts",
+        "retrospectives",
       ]),
     );
     expect(database.prepare("PRAGMA foreign_keys").get()).toEqual({ foreign_keys: 1 });

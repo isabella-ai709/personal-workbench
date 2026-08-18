@@ -17,6 +17,8 @@ import { TaskScheduler } from "./modules/tasks/task-scheduler";
 import { TaskService } from "./modules/tasks/task-service";
 import { LocalSession } from "./security/local-session";
 import { cleanupRetention } from "./maintenance/retention";
+import { RetrospectiveRepository } from "./modules/retrospectives/retrospective-repository";
+import { RetrospectiveService } from "./modules/retrospectives/retrospective-service";
 
 const config = loadServerConfig();
 const database = openDatabase(config.databasePath);
@@ -46,6 +48,7 @@ const app = buildApp(
     businessRepository,
     new CodexBusinessAiExtractor({ workingDirectory: config.workingDirectory }),
   ),
+  new RetrospectiveService(new RetrospectiveRepository(database)),
 );
 
 const shutdown = async () => {

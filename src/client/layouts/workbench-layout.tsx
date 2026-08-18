@@ -13,12 +13,10 @@ const activeItems = [
   { to: "/tasks", label: "任务日志", icon: <Clock24Regular /> },
   { to: "/skills", label: "Skill 管理", icon: <Toolbox24Regular /> },
   { to: "/business", label: "商务对接", icon: <Briefcase24Regular /> },
+  { to: "/retrospectives", label: "经验复盘", icon: <AppsListDetail24Regular /> },
 ];
 
-const futureItems = [
-  { label: "API 管理", icon: <PlugConnected24Regular /> },
-  { label: "经验复盘", icon: <AppsListDetail24Regular /> },
-];
+const futureItems = [{ label: "API 管理", icon: <PlugConnected24Regular /> }];
 
 export function WorkbenchLayout() {
   return (

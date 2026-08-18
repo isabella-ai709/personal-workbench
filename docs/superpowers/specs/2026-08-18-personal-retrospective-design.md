@@ -87,18 +87,18 @@ Personal Workbench 是仅供用户本人使用的本机工作台。经验复盘�
 
 新增 `retrospectives` 表：
 
-| 字段 | 类型与规则 | 用途 |
-| --- | --- | --- |
-| `id` | TEXT，UUID，主键 | 复盘唯一标识 |
-| `title` | TEXT，1～200 字符，必填 | 复盘主题 |
-| `review` | TEXT，最多 20,000 字符 | 事情回顾 |
-| `did_well` | TEXT，最多 20,000 字符 | 做对的部分 |
-| `did_wrong` | TEXT，最多 20,000 字符 | 做错的部分 |
-| `lesson` | TEXT，最多 20,000 字符 | 经验总结 |
-| `next_improvement` | TEXT，最多 20,000 字符 | 下次改进 |
-| `created_at` | TEXT，ISO 时间，必填 | 创建时间 |
-| `updated_at` | TEXT，ISO 时间，必填 | 最近修改时间 |
-| `deleted_at` | TEXT，可空 | 软删除时间 |
+| 字段               | 类型与规则              | 用途         |
+| ------------------ | ----------------------- | ------------ |
+| `id`               | TEXT，UUID，主键        | 复盘唯一标识 |
+| `title`            | TEXT，1～200 字符，必填 | 复盘主题     |
+| `review`           | TEXT，最多 20,000 字符  | 事情回顾     |
+| `did_well`         | TEXT，最多 20,000 字符  | 做对的部分   |
+| `did_wrong`        | TEXT，最多 20,000 字符  | 做错的部分   |
+| `lesson`           | TEXT，最多 20,000 字符  | 经验总结     |
+| `next_improvement` | TEXT，最多 20,000 字符  | 下次改进     |
+| `created_at`       | TEXT，ISO 时间，必填    | 创建时间     |
+| `updated_at`       | TEXT，ISO 时间，必填    | 最近修改时间 |
+| `deleted_at`       | TEXT，可空              | 软删除时间   |
 
 为未删除记录建立按 `created_at DESC, id DESC` 排序的索引。相同创建时间时使用 `id` 保证稳定排序。
 
