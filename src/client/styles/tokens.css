@@ -603,6 +603,32 @@ textarea {
   align-items: center;
 }
 
+.skill-statistics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.skill-statistic {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--workbench-border);
+  border-radius: var(--workbench-radius);
+  background: var(--workbench-surface);
+}
+
+.skill-statistic span {
+  color: var(--workbench-muted);
+  font-size: 13px;
+}
+
+.skill-statistic strong {
+  color: #242424;
+  font-size: 24px;
+}
+
 .skill-page-heading,
 .skill-detail-header,
 .skill-list-heading {
@@ -632,6 +658,17 @@ textarea {
   overflow: auto;
   border-right: 1px solid var(--workbench-border);
   background: #fafafa;
+}
+
+.skill-group h3 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 14px 16px 6px;
+  color: var(--workbench-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .skill-list {
@@ -1185,6 +1222,10 @@ textarea {
 
   .skill-workspace {
     grid-template-columns: 1fr;
+  }
+
+  .skill-statistics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .retrospective-workspace {

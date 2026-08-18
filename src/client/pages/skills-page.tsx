@@ -31,6 +31,13 @@ import { SkillList } from "../features/skills/skill-list";
 
 type OriginFilter = "all" | SkillOrigin;
 
+const statisticCards = [
+  { key: "ai", label: "可用于 AI" },
+  { key: "system", label: "系统辅助" },
+  { key: "installed", label: "用户安装" },
+  { key: "generated", label: "自己生成" },
+] as const;
+
 export function SkillsPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -77,6 +84,15 @@ export function SkillsPage() {
   }, [skills, selected]);
 
   const stale = skillsQuery.data?.some((skill) => skill.stale) ?? false;
+  const statistics = useMemo(() => {
+    const allSkills = skillsQuery.data ?? [];
+    return {
+      ai: allSkills.filter((skill) => skill.enabled).length,
+      system: allSkills.filter((skill) => skill.origin === "system").length,
+      installed: allSkills.filter((skill) => skill.origin === "installed").length,
+      generated: allSkills.filter((skill) => skill.origin === "generated").length,
+    };
+  }, [skillsQuery.data]);
   return (
     <div className="page-frame">
       <header className="page-heading skill-page-heading">
@@ -88,6 +104,15 @@ export function SkillsPage() {
           刷新
         </Button>
       </header>
+
+      <section className="skill-statistics" aria-label="Skill 统计">
+        {statisticCards.map((card) => (
+          <div className="skill-statistic" key={card.key}>
+            <span>{card.label}</span>
+            <strong>{statistics[card.key]}</strong>
+          </div>
+        ))}
+      </section>
 
       {stale ? (
         <MessageBar intent="warning">

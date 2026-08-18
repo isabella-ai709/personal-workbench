@@ -121,6 +121,22 @@ const installed: SkillSummary = {
   location: "C:\\skills\\meeting",
 };
 
+const system = {
+  ...installed,
+  id: "b".repeat(64),
+  name: "系统辅助",
+  origin: "system" as const,
+  deletable: false,
+};
+const generated = {
+  ...installed,
+  id: "c".repeat(64),
+  name: "销售复盘",
+  origin: "generated" as const,
+  enabled: false,
+  deletable: true,
+};
+
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
@@ -147,6 +163,21 @@ describe("skills page", () => {
     expect(
       screen.getByText(/先停用这个 Skill，再将整个 Skill 目录移入 Windows 系统回收站/),
     ).toBeInTheDocument();
+  });
+
+  it("shows AI availability and origin statistics", async () => {
+    vi.mocked(getSkills).mockResolvedValue([installed, system, generated]);
+    vi.mocked(getSkill).mockResolvedValue({ ...installed, content: "# 会议整理" });
+    renderPage();
+
+    expect(await screen.findByText("会议整理")).toBeInTheDocument();
+    const statistics = await screen.findByRole("region", { name: "Skill 统计" });
+    expect(statistics).toHaveTextContent("可用于 AI");
+    expect(statistics).toHaveTextContent("系统辅助");
+    expect(statistics).toHaveTextContent("用户安装");
+    expect(statistics).toHaveTextContent("自己生成");
+    expect(statistics).toHaveTextContent("2");
+    expect(statistics).toHaveTextContent("1");
   });
 
   it("marks cached data as read-only", async () => {

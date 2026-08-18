@@ -26,11 +26,15 @@ export function classifySkillOrigin(
   override?: SkillOriginOverride | null,
 ): SkillOrigin {
   if (metadata.scope === "system" || metadata.scope === "admin") return "system";
-  const normalizedPath = normalize(metadata.path).replaceAll("\\", "/").toLowerCase();
-  if (normalizedPath.includes("/.codex/plugins/") || normalizedPath.includes("/plugins/cache/")) {
-    return "plugin";
-  }
+  if (isPluginSkillPath(metadata.path)) return "plugin";
   return override?.origin ?? "unconfirmed";
+}
+
+export function isPluginSkillPath(path: string): boolean {
+  const normalizedPath = normalize(path).replaceAll("\\", "/").toLowerCase();
+  return ["/.codex/plugins/", "/plugins/cache/", "/.codex/plugin-cache/"].some((marker) =>
+    normalizedPath.includes(marker),
+  );
 }
 
 export class SkillService {
