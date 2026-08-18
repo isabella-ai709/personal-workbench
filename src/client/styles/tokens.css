@@ -741,13 +741,14 @@ textarea {
 
 .skill-statistics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
   gap: 12px;
   margin-top: 20px;
 }
 
 .skill-statistic {
   display: grid;
+  min-width: 0;
   gap: 6px;
   padding: 14px 16px;
   border: 1px solid var(--workbench-border);
@@ -756,8 +757,11 @@ textarea {
 }
 
 .skill-statistic span {
+  overflow: hidden;
   color: var(--workbench-muted);
   font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .skill-statistic strong {
@@ -1384,10 +1388,6 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .skill-statistics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .retrospective-workspace {
     grid-template-columns: 1fr;
   }
@@ -1615,6 +1615,18 @@ textarea {
 
   .retrospective-right-wrong,
   .retrospective-detail-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .skill-statistics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .skill-statistics {
     grid-template-columns: 1fr;
   }
 }
