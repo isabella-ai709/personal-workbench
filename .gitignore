@@ -1,0 +1,13 @@
+.superpowers/
+.env
+.env.*
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+data/
+logs/
+*.db
+*.db-shm
+*.db-wal
