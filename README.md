@@ -43,4 +43,4 @@ pnpm test:integration
 pnpm cleanup
 ```
 
-E2E 测试使用隔离的测试数据和 Fake Codex，不会修改真实 Skill 配置；真实 Codex 能力验证仍通过 `pnpm verify:codex` 手动执行。
+当前自动化检查覆盖数据库、任务调度、API、组件和安全边界；真实 Codex 能力验证仍通过 `pnpm verify:codex` 手动执行，且不会修改真实 Skill 配置。
