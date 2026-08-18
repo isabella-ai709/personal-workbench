@@ -64,9 +64,26 @@ export function DashboardPage() {
   const data = query.data;
   return (
     <div className="page-frame">
-      <header className="page-heading">
-        <h1>首页</h1>
-        <p>先看需要关注的个人事项，再进入具体模块继续处理。</p>
+      <header className="dashboard-welcome">
+        <div className="dashboard-welcome-copy">
+          <span className="dashboard-welcome-kicker">Isabella.Y 工作台</span>
+          <h1>
+            <span className="sr-only">首页</span>
+            <span aria-hidden="true">今天，从最重要的一件事开始。</span>
+          </h1>
+          <p>先看需要关注的个人事项，再进入具体模块继续处理。</p>
+          <Button
+            appearance="primary"
+            icon={<ArrowRight20Regular />}
+            iconPosition="after"
+            onClick={() => navigate("/tasks")}
+          >
+            打开任务计划
+          </Button>
+        </div>
+        <div className="dashboard-welcome-art" aria-hidden="true">
+          <img src="/isabella-avatar.jpg" alt="" />
+        </div>
       </header>
 
       {data.skills.stale ? (

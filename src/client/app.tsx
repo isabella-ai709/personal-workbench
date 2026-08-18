@@ -51,7 +51,7 @@ export function App() {
             <Route
               path="business"
               element={
-                <Suspense fallback={<div className="page-loading">正在加载商务对接</div>}>
+                <Suspense fallback={<div className="page-loading">正在加载商务合作</div>}>
                   <BusinessPage />
                 </Suspense>
               }

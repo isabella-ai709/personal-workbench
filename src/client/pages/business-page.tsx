@@ -324,7 +324,7 @@ export function BusinessPage() {
     <div className="page-frame business-page">
       <header className="page-heading business-heading">
         <div>
-          <h1>商务对接</h1>
+          <h1>商务合作</h1>
           <p>统一管理关系、销售机会、合作项目、沟通记录和下一步行动。</p>
         </div>
         <div className="business-heading-actions">

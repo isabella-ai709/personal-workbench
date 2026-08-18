@@ -163,7 +163,7 @@ describe("business page", () => {
         <BusinessPage />
       </QueryClientProvider>,
     );
-    expect(await screen.findByRole("heading", { name: "商务对接" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "商务合作" })).toBeInTheDocument();
     expect(await screen.findByText(/¥256,000 预计金额/)).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "公司与联系人" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "AI 整理" })).toBeInTheDocument();

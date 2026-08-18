@@ -12,7 +12,7 @@ const activeItems = [
   { to: "/", label: "首页", icon: <Home24Regular /> },
   { to: "/tasks", label: "任务计划", icon: <Clock24Regular /> },
   { to: "/skills", label: "Skill 管理", icon: <Toolbox24Regular /> },
-  { to: "/business", label: "商务对接", icon: <Briefcase24Regular /> },
+  { to: "/business", label: "商务合作", icon: <Briefcase24Regular /> },
   { to: "/retrospectives", label: "经验复盘", icon: <AppsListDetail24Regular /> },
 ];
 
@@ -23,12 +23,15 @@ export function WorkbenchLayout() {
     <div className="workbench-shell">
       <aside className="workbench-sidebar" aria-label="工作台导航">
         <div className="workbench-brand">
-          <span className="workbench-brand-mark" aria-hidden="true">
-            C
-          </span>
+          <img
+            className="workbench-brand-mark"
+            src="/isabella-avatar.jpg"
+            alt=""
+            aria-hidden="true"
+          />
           <span className="workbench-brand-copy">
-            <strong>个人工作台</strong>
-            <span>Codex 助理控制台</span>
+            <strong>Isabella.Y 工作台</strong>
+            <span>Personal workspace</span>
           </span>
         </div>
         <nav className="workbench-nav">
