@@ -5,6 +5,8 @@ import { openDatabase, type WorkbenchDatabase } from "../../src/server/db/connec
 import { migrateDatabase } from "../../src/server/db/migrate";
 import { AiNewsRepository } from "../../src/server/modules/ai-news/ai-news-repository";
 import { AiNewsService } from "../../src/server/modules/ai-news/ai-news-service";
+import { NotificationRepository } from "../../src/server/modules/notifications/notification-repository";
+import { NotificationService } from "../../src/server/modules/notifications/notification-service";
 import { LocalSession } from "../../src/server/security/local-session";
 import { aiNewsIngestFixture } from "../fixtures/ai-news-report";
 
@@ -22,8 +24,9 @@ function setup() {
   const database = openDatabase(":memory:");
   databases.push(database);
   migrateDatabase(database);
+  const notifications = new NotificationRepository(database, () => "2026-08-19T06:03:00.000Z");
   const service = new AiNewsService(
-    new AiNewsRepository(database),
+    new AiNewsRepository(database, notifications),
     () => "2026-08-19T06:03:00.000Z",
   );
   const app = buildApp(
@@ -36,6 +39,7 @@ function setup() {
     undefined,
     undefined,
     service,
+    new NotificationService(notifications, undefined, undefined, undefined),
   );
   apps.push(app);
   return app;
@@ -66,6 +70,13 @@ describe("AI news routes", () => {
       importedAt: "2026-08-19T06:03:00.000Z",
     });
     expect((await put()).statusCode).toBe(200);
+    const messages = await app.inject({ method: "GET", url: "/api/notifications?view=all" });
+    expect(messages.json().items).toHaveLength(1);
+    expect(messages.json().items[0]).toMatchObject({
+      sourceType: "ai_news_report",
+      severity: "normal",
+      status: "unread",
+    });
     expect(
       (await app.inject({ method: "GET", url: "/api/ai-news/reports" })).json().items,
     ).toHaveLength(1);

@@ -5,6 +5,7 @@ import type {
 } from "../../../shared/ai-news-contracts";
 import { aiNewsReportSchema } from "../../../shared/ai-news-contracts";
 import type { WorkbenchDatabase } from "../../db/connection";
+import type { NotificationRepository } from "../notifications/notification-repository";
 
 interface AiNewsReportRow {
   report_id: string;
@@ -49,7 +50,10 @@ function mapDetail(row: AiNewsReportRow): AiNewsReportDetail {
 }
 
 export class AiNewsRepository {
-  constructor(private readonly database: WorkbenchDatabase) {}
+  constructor(
+    private readonly database: WorkbenchDatabase,
+    private readonly notifications?: NotificationRepository,
+  ) {}
 
   upsert(input: AiNewsIngest, importedAt: string): AiNewsReportDetail {
     const { report, schemaVersion } = input;
@@ -93,6 +97,18 @@ export class AiNewsRepository {
           report.stats.failed_sources,
           JSON.stringify(report),
         );
+      this.notifications?.publish({
+        sourceModule: "ai_news",
+        sourceType: "ai_news_report",
+        sourceId: report.report_id,
+        eventType: "report_published",
+        sourceVersion: report.report_id,
+        title: `AI 新闻周报已生成：${report.title}`,
+        body: `本期收录 ${report.article_count} 篇内容，已可以在工作台中阅读。`,
+        severity: "normal",
+        occurredAt: importedAt,
+        metadata: { href: "/ai-news", sourceLabel: "AI 新闻资讯" },
+      });
       this.database.exec("COMMIT");
     } catch (error) {
       this.database.exec("ROLLBACK");

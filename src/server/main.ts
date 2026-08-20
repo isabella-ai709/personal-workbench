@@ -18,13 +18,29 @@ import { RetrospectiveRepository } from "./modules/retrospectives/retrospective-
 import { RetrospectiveService } from "./modules/retrospectives/retrospective-service";
 import { AiNewsRepository } from "./modules/ai-news/ai-news-repository";
 import { AiNewsService } from "./modules/ai-news/ai-news-service";
+import { NotificationRepository } from "./modules/notifications/notification-repository";
+import { NotificationScanner } from "./modules/notifications/notification-scanner";
+import { NotificationService } from "./modules/notifications/notification-service";
 
 const config = loadServerConfig();
 const database = openDatabase(config.databasePath);
 migrateDatabase(database);
 const taskPlanService = new TaskPlanService(new TaskPlanRepository(database));
 const businessRepository = new BusinessRepository(database);
-const aiNewsService = new AiNewsService(new AiNewsRepository(database));
+const businessService = new BusinessService(businessRepository);
+const notificationRepository = new NotificationRepository(database);
+const notificationScanner = new NotificationScanner(
+  notificationRepository,
+  taskPlanService,
+  businessService,
+);
+const notificationService = new NotificationService(
+  notificationRepository,
+  notificationScanner,
+  taskPlanService,
+  businessService,
+);
+const aiNewsService = new AiNewsService(new AiNewsRepository(database, notificationRepository));
 const skillService = new SkillService(
   new CodexSkillGateway({ cwd: config.workingDirectory }),
   new SkillOriginRepository(database),
@@ -37,7 +53,7 @@ const app = buildApp(
   skillService,
   new LocalSession({ origin: serverOrigin(config), integrationToken: config.integrationToken }),
   new DashboardService(taskPlanService, skillService),
-  new BusinessService(businessRepository),
+  businessService,
   new BusinessAiService(
     businessRepository,
     new CodexBusinessAiExtractor({ workingDirectory: config.workingDirectory }),
@@ -45,7 +61,10 @@ const app = buildApp(
   new RetrospectiveService(new RetrospectiveRepository(database)),
   undefined,
   aiNewsService,
+  notificationService,
 );
+
+notificationScanner.scan();
 
 const shutdown = async () => {
   await app.close();

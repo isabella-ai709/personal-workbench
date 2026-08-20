@@ -48,6 +48,7 @@ type TaskPlanFilter =
   | "status:pending"
   | "status:in_progress"
   | "status:blocked"
+  | "status:cancelled"
   | "priority:high"
   | "priority:medium"
   | "priority:low";
@@ -65,6 +66,7 @@ const statusCopy = {
   in_progress: "进行中",
   blocked: "等待/受阻",
   completed: "已完成",
+  cancelled: "已取消",
 } as const;
 const priorityCopy = { low: "低", medium: "中", high: "高" } as const;
 const groupCopy: Record<FocusGroup, string> = {
@@ -139,7 +141,7 @@ export function TaskPlansPage() {
       if (view === "deleted") return Boolean(item.deletedAt);
       if (item.deletedAt) return false;
       if (view === "completed") return item.status === "completed";
-      if (item.status === "completed") return false;
+      if (["completed", "cancelled"].includes(item.status)) return false;
       if (view === "ideas") return item.type === "idea";
       if (view === "focus") return getFocusGroup(item) !== null;
       return true;
@@ -254,6 +256,7 @@ export function TaskPlansPage() {
               <option value="status:pending">待处理</option>
               <option value="status:in_progress">进行中</option>
               <option value="status:blocked">等待/受阻</option>
+              <option value="status:cancelled">已取消</option>
             </optgroup>
             <optgroup label="优先级">
               <option value="priority:high">高优先级</option>
@@ -331,25 +334,29 @@ export function TaskPlansPage() {
                     </Button>
                   ) : (
                     <>
-                      {selected.status !== "in_progress" ? (
-                        <Button onClick={() => changeStatus(selected, "in_progress")}>
-                          开始处理
-                        </Button>
-                      ) : null}
-                      {selected.status !== "blocked" ? (
-                        <Button onClick={() => changeStatus(selected, "blocked")}>等待/受阻</Button>
-                      ) : null}
-                      {selected.status !== "completed" ? (
-                        <Button
-                          appearance="primary"
-                          onClick={() => changeStatus(selected, "completed")}
-                        >
-                          标记完成
-                        </Button>
-                      ) : (
+                      {["completed", "cancelled"].includes(selected.status) ? (
                         <Button onClick={() => changeStatus(selected, "pending")}>
                           恢复为待处理
                         </Button>
+                      ) : (
+                        <>
+                          {selected.status !== "in_progress" ? (
+                            <Button onClick={() => changeStatus(selected, "in_progress")}>
+                              开始处理
+                            </Button>
+                          ) : null}
+                          {selected.status !== "blocked" ? (
+                            <Button onClick={() => changeStatus(selected, "blocked")}>
+                              等待/受阻
+                            </Button>
+                          ) : null}
+                          <Button
+                            appearance="primary"
+                            onClick={() => changeStatus(selected, "completed")}
+                          >
+                            标记完成
+                          </Button>
+                        </>
                       )}
                       <Button
                         appearance="subtle"

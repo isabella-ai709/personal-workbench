@@ -19,7 +19,12 @@ export function getFocusGroup(
   now = new Date(),
   timeZone = "Asia/Shanghai",
 ): FocusGroup | null {
-  if (taskPlan.deletedAt || taskPlan.status === "completed" || taskPlan.type === "idea")
+  if (
+    taskPlan.deletedAt ||
+    taskPlan.status === "completed" ||
+    taskPlan.status === "cancelled" ||
+    taskPlan.type === "idea"
+  )
     return null;
 
   if (taskPlan.dueAt) {

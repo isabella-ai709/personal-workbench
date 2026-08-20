@@ -113,6 +113,7 @@ export function TaskPlanForm({ open, taskPlan, busy, onClose, onSubmit }: TaskPl
                     <option value="in_progress">进行中</option>
                     <option value="blocked">等待/受阻</option>
                     <option value="completed">已完成</option>
+                    <option value="cancelled">已取消</option>
                   </Select>
                 </Field>
                 <Field label="优先级" required>

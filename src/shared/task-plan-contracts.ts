@@ -8,7 +8,13 @@ const longTextSchema = z.string().trim().max(20_000);
 export const taskPlanTypeSchema = z.enum(["todo", "plan", "idea"]);
 export type TaskPlanType = z.infer<typeof taskPlanTypeSchema>;
 
-export const taskPlanStatusSchema = z.enum(["pending", "in_progress", "blocked", "completed"]);
+export const taskPlanStatusSchema = z.enum([
+  "pending",
+  "in_progress",
+  "blocked",
+  "completed",
+  "cancelled",
+]);
 export type TaskPlanStatus = z.infer<typeof taskPlanStatusSchema>;
 
 export const taskPlanPrioritySchema = z.enum(["low", "medium", "high"]);

@@ -54,6 +54,13 @@ describe("task plan routes", () => {
     });
     expect(completed.json()).toMatchObject({ completedAt: now, notes: "完成初版" });
 
+    const cancelled = await app.inject({
+      method: "POST",
+      url: `/api/task-plans/${id}/status`,
+      payload: { status: "cancelled" },
+    });
+    expect(cancelled.json()).toMatchObject({ status: "cancelled", completedAt: null });
+
     expect(
       (await app.inject({ method: "DELETE", url: `/api/task-plans/${id}` })).json().deletedAt,
     ).toBe(now);

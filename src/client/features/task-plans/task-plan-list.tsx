@@ -26,6 +26,7 @@ const statusCopy = {
   in_progress: "进行中",
   blocked: "等待/受阻",
   completed: "已完成",
+  cancelled: "已取消",
 } as const;
 
 function formatDueAt(value: string | null): string {
@@ -82,7 +83,7 @@ function TaskPlanRow({
               </option>
             ))}
           </select>
-          {item.status !== "completed" ? (
+          {!(["completed", "cancelled"] as TaskPlanStatus[]).includes(item.status) ? (
             <Button
               appearance="subtle"
               size="small"

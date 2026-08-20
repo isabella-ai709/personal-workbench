@@ -23,6 +23,9 @@ const RetrospectivesPage = lazy(() =>
 const AiNewsPage = lazy(() =>
   import("./pages/ai-news-page").then((module) => ({ default: module.AiNewsPage })),
 );
+const NotificationsPage = lazy(() =>
+  import("./pages/notifications-page").then((module) => ({ default: module.NotificationsPage })),
+);
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false } },
@@ -35,6 +38,14 @@ export function App() {
         <Routes>
           <Route element={<WorkbenchLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route
+              path="notifications"
+              element={
+                <Suspense fallback={<div className="page-loading">正在加载消息提醒</div>}>
+                  <NotificationsPage />
+                </Suspense>
+              }
+            />
             <Route
               path="tasks"
               element={

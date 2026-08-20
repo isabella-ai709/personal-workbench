@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { App } from "./app";
 import "./styles/tokens.css";
 import "./styles/ai-news.css";
+import "./styles/notifications.css";
 
 const rootElement = document.getElementById("root");
 
