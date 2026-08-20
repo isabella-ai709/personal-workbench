@@ -15,6 +15,8 @@ import type { SkillService } from "./modules/skills/skill-service";
 import { registerTaskPlanRoutes } from "./modules/task-plans/task-plan-routes";
 import type { TaskPlanService } from "./modules/task-plans/task-plan-service";
 import type { LocalSession } from "./security/local-session";
+import { registerAiNewsRoutes } from "./modules/ai-news/ai-news-routes";
+import type { AiNewsService } from "./modules/ai-news/ai-news-service";
 
 export function buildApp(
   taskPlanService?: TaskPlanService,
@@ -25,8 +27,9 @@ export function buildApp(
   businessAiService?: BusinessAiService,
   retrospectiveService?: RetrospectiveService,
   retrospectiveAiService?: RetrospectiveAiService,
+  aiNewsService?: AiNewsService,
 ): FastifyInstance {
-  const app = Fastify({ logger: false });
+  const app = Fastify({ logger: false, bodyLimit: 8 * 1024 * 1024 });
   localSession?.register(app);
   if (taskPlanService) registerTaskPlanRoutes(app, taskPlanService);
   if (skillService) registerSkillRoutes(app, skillService);
@@ -34,6 +37,7 @@ export function buildApp(
   if (businessService) registerBusinessRoutes(app, businessService, businessAiService);
   if (retrospectiveService)
     registerRetrospectiveRoutes(app, retrospectiveService, retrospectiveAiService);
+  if (aiNewsService) registerAiNewsRoutes(app, aiNewsService);
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) {
       return reply.code(400).send({

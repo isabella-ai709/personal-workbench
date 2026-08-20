@@ -5,6 +5,7 @@ export interface ServerConfig {
   port: number;
   databasePath: string;
   workingDirectory: string;
+  integrationToken?: string;
 }
 
 export function loadServerConfig(environment: NodeJS.ProcessEnv = process.env): ServerConfig {
@@ -22,6 +23,7 @@ export function loadServerConfig(environment: NodeJS.ProcessEnv = process.env): 
     port,
     databasePath: resolve(environment.WORKBENCH_DATABASE_PATH ?? "data/workbench.sqlite"),
     workingDirectory,
+    integrationToken: environment.WORKBENCH_INTEGRATION_TOKEN?.trim() || undefined,
   };
 }
 

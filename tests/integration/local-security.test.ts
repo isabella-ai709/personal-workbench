@@ -7,6 +7,7 @@ import { LocalSession } from "../../src/server/security/local-session";
 
 const origin = "http://127.0.0.1:4310";
 const token = "test-session-token-with-enough-entropy";
+const integrationToken = "test-integration-token-with-enough-entropy";
 const apps: Array<ReturnType<typeof buildApp>> = [];
 
 afterEach(async () => {
@@ -17,7 +18,11 @@ function setup() {
   const taskPlanService = {
     create: () => ({ id: "task-created" }),
   } as unknown as TaskPlanService;
-  const app = buildApp(taskPlanService, undefined, new LocalSession({ origin, token }));
+  const app = buildApp(
+    taskPlanService,
+    undefined,
+    new LocalSession({ origin, token, integrationToken }),
+  );
   apps.push(app);
   return app;
 }
@@ -113,5 +118,46 @@ describe("localhost security", () => {
     });
     expect(response.body).not.toContain("private");
     expect(response.body).not.toContain("stack");
+  });
+
+  it("only permits bearer authentication on the exact AI news ingestion route", async () => {
+    const app = setup();
+    app.put("/api/integrations/ai-news/reports/:reportId", async () => ({ ok: true }));
+    app.put("/api/integrations/ai-news/other/:reportId", async () => ({ ok: true }));
+    const headers = {
+      authorization: `Bearer ${integrationToken}`,
+      "content-type": "application/json",
+    };
+
+    expect(
+      (
+        await app.inject({
+          method: "PUT",
+          url: "/api/integrations/ai-news/reports/report-1",
+          headers,
+          payload: {},
+        })
+      ).statusCode,
+    ).toBe(200);
+    expect(
+      (
+        await app.inject({
+          method: "PUT",
+          url: "/api/integrations/ai-news/other/report-1",
+          headers,
+          payload: {},
+        })
+      ).statusCode,
+    ).toBe(403);
+    expect(
+      (
+        await app.inject({
+          method: "PUT",
+          url: "/api/integrations/ai-news/reports/report-1",
+          headers: { ...headers, authorization: "Bearer wrong" },
+          payload: {},
+        })
+      ).statusCode,
+    ).toBe(403);
   });
 });

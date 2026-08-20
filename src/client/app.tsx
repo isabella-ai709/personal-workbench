@@ -20,6 +20,9 @@ const RetrospectivesPage = lazy(() =>
     default: module.RetrospectivesPage,
   })),
 );
+const AiNewsPage = lazy(() =>
+  import("./pages/ai-news-page").then((module) => ({ default: module.AiNewsPage })),
+);
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false } },
@@ -61,6 +64,14 @@ export function App() {
               element={
                 <Suspense fallback={<div className="page-loading">正在加载经验复盘</div>}>
                   <RetrospectivesPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="ai-news"
+              element={
+                <Suspense fallback={<div className="page-loading">正在加载 AI 新闻资讯</div>}>
+                  <AiNewsPage />
                 </Suspense>
               }
             />

@@ -16,12 +16,15 @@ import { TaskPlanService } from "./modules/task-plans/task-plan-service";
 import { LocalSession } from "./security/local-session";
 import { RetrospectiveRepository } from "./modules/retrospectives/retrospective-repository";
 import { RetrospectiveService } from "./modules/retrospectives/retrospective-service";
+import { AiNewsRepository } from "./modules/ai-news/ai-news-repository";
+import { AiNewsService } from "./modules/ai-news/ai-news-service";
 
 const config = loadServerConfig();
 const database = openDatabase(config.databasePath);
 migrateDatabase(database);
 const taskPlanService = new TaskPlanService(new TaskPlanRepository(database));
 const businessRepository = new BusinessRepository(database);
+const aiNewsService = new AiNewsService(new AiNewsRepository(database));
 const skillService = new SkillService(
   new CodexSkillGateway({ cwd: config.workingDirectory }),
   new SkillOriginRepository(database),
@@ -32,7 +35,7 @@ const skillService = new SkillService(
 const app = buildApp(
   taskPlanService,
   skillService,
-  new LocalSession({ origin: serverOrigin(config) }),
+  new LocalSession({ origin: serverOrigin(config), integrationToken: config.integrationToken }),
   new DashboardService(taskPlanService, skillService),
   new BusinessService(businessRepository),
   new BusinessAiService(
@@ -40,6 +43,8 @@ const app = buildApp(
     new CodexBusinessAiExtractor({ workingDirectory: config.workingDirectory }),
   ),
   new RetrospectiveService(new RetrospectiveRepository(database)),
+  undefined,
+  aiNewsService,
 );
 
 const shutdown = async () => {

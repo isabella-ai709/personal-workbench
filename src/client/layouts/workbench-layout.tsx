@@ -4,6 +4,7 @@ import {
   Clock24Regular,
   Home24Regular,
   PlugConnected24Regular,
+  News24Regular,
   Toolbox24Regular,
 } from "@fluentui/react-icons";
 import { NavLink, Outlet } from "react-router-dom";
@@ -14,6 +15,7 @@ const activeItems = [
   { to: "/skills", label: "Skill 管理", icon: <Toolbox24Regular /> },
   { to: "/business", label: "商务合作", icon: <Briefcase24Regular /> },
   { to: "/retrospectives", label: "经验复盘", icon: <AppsListDetail24Regular /> },
+  { to: "/ai-news", label: "AI新闻资讯", icon: <News24Regular /> },
 ];
 
 const futureItems = [{ label: "API 管理", icon: <PlugConnected24Regular /> }];

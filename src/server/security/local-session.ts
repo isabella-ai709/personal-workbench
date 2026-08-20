@@ -10,15 +10,18 @@ const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 export interface LocalSessionOptions {
   origin: string;
   token?: string;
+  integrationToken?: string;
 }
 
 export class LocalSession {
   readonly token: string;
   readonly origin: string;
+  private readonly integrationToken?: string;
 
   constructor(options: LocalSessionOptions) {
     this.origin = new URL(options.origin).origin;
     this.token = options.token ?? randomBytes(32).toString("base64url");
+    this.integrationToken = options.integrationToken;
   }
 
   register(app: FastifyInstance): void {
@@ -35,6 +38,14 @@ export class LocalSession {
       });
 
       const requestOrigin = request.headers.origin;
+      if (
+        isAiNewsIntegrationRequest(request) &&
+        !requestOrigin &&
+        hasJsonContentType(request) &&
+        matchesBearerToken(request.headers.authorization, this.integrationToken)
+      ) {
+        return;
+      }
       if (requestOrigin && requestOrigin !== this.origin) {
         throw new WorkbenchError("FORBIDDEN", "Cross-origin requests are not allowed", 403);
       }
@@ -55,6 +66,13 @@ export class LocalSession {
   }
 }
 
+function isAiNewsIntegrationRequest(request: FastifyRequest): boolean {
+  return (
+    request.method === "PUT" &&
+    request.routeOptions.url === "/api/integrations/ai-news/reports/:reportId"
+  );
+}
+
 function hasJsonContentType(request: FastifyRequest): boolean {
   const contentType = request.headers["content-type"];
   return typeof contentType === "string" && /^application\/json(?:\s*;|$)/i.test(contentType);
@@ -67,4 +85,12 @@ function matchesToken(candidate: string | string[] | undefined, expected: string
   return (
     actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer)
   );
+}
+
+function matchesBearerToken(
+  authorization: string | undefined,
+  expected: string | undefined,
+): boolean {
+  if (!expected || !authorization?.startsWith("Bearer ")) return false;
+  return matchesToken(authorization.slice("Bearer ".length), expected);
 }
