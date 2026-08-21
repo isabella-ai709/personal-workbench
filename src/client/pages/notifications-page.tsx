@@ -46,6 +46,7 @@ const sourceCopy: Record<NotificationSourceModule, string> = {
   task_plans: "任务计划",
   business: "商务合作",
   ai_news: "AI 新闻资讯",
+  ai_opportunities: "小D机会",
 };
 const severityCopy = { normal: "普通", important: "重要", urgent: "紧急" } as const;
 const partnershipStatusCopy: Record<string, string> = {

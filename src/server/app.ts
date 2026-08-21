@@ -19,6 +19,8 @@ import { registerAiNewsRoutes } from "./modules/ai-news/ai-news-routes";
 import type { AiNewsService } from "./modules/ai-news/ai-news-service";
 import { registerNotificationRoutes } from "./modules/notifications/notification-routes";
 import type { NotificationService } from "./modules/notifications/notification-service";
+import { registerAiOpportunityRoutes } from "./modules/ai-opportunities/ai-opportunity-routes";
+import type { AiOpportunityService } from "./modules/ai-opportunities/ai-opportunity-service";
 
 export function buildApp(
   taskPlanService?: TaskPlanService,
@@ -31,6 +33,7 @@ export function buildApp(
   retrospectiveAiService?: RetrospectiveAiService,
   aiNewsService?: AiNewsService,
   notificationService?: NotificationService,
+  aiOpportunityService?: AiOpportunityService,
 ): FastifyInstance {
   const app = Fastify({ logger: false, bodyLimit: 8 * 1024 * 1024 });
   localSession?.register(app);
@@ -42,6 +45,7 @@ export function buildApp(
     registerRetrospectiveRoutes(app, retrospectiveService, retrospectiveAiService);
   if (aiNewsService) registerAiNewsRoutes(app, aiNewsService);
   if (notificationService) registerNotificationRoutes(app, notificationService);
+  if (aiOpportunityService) registerAiOpportunityRoutes(app, aiOpportunityService);
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) {
       return reply.code(400).send({

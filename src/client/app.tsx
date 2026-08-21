@@ -23,6 +23,11 @@ const RetrospectivesPage = lazy(() =>
 const AiNewsPage = lazy(() =>
   import("./pages/ai-news-page").then((module) => ({ default: module.AiNewsPage })),
 );
+const AiOpportunitiesPage = lazy(() =>
+  import("./pages/ai-opportunities-page").then((module) => ({
+    default: module.AiOpportunitiesPage,
+  })),
+);
 const NotificationsPage = lazy(() =>
   import("./pages/notifications-page").then((module) => ({ default: module.NotificationsPage })),
 );
@@ -83,6 +88,14 @@ export function App() {
               element={
                 <Suspense fallback={<div className="page-loading">正在加载 AI 新闻资讯</div>}>
                   <AiNewsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="ai-news/opportunities"
+              element={
+                <Suspense fallback={<div className="page-loading">正在加载小D机会</div>}>
+                  <AiOpportunitiesPage />
                 </Suspense>
               }
             />

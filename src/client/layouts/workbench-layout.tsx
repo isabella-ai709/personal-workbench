@@ -21,6 +21,7 @@ const activeItems = [
   { to: "/business", label: "商务合作", icon: <Briefcase24Regular /> },
   { to: "/retrospectives", label: "经验复盘", icon: <AppsListDetail24Regular /> },
   { to: "/ai-news", label: "AI新闻资讯", icon: <News24Regular /> },
+  { to: "/ai-news/opportunities", label: "小D机会", icon: <News24Regular />, child: true },
 ];
 
 const futureItems = [{ label: "API 管理", icon: <PlugConnected24Regular /> }];
@@ -49,7 +50,12 @@ export function WorkbenchLayout() {
         </div>
         <nav className="workbench-nav">
           {activeItems.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.to === "/"}>
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === "/" || item.to === "/ai-news"}
+              className={item.child ? "workbench-nav-child" : undefined}
+            >
               {item.icon}
               <span>{item.label}</span>
               {item.to === "/notifications" && (summary.data?.importantUnread ?? 0) > 0 ? (

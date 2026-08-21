@@ -1,0 +1,75 @@
+.xiaod-eyebrow {
+  color: #8b5e34;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+.xiaod-report {
+  display: grid;
+  gap: 24px;
+  margin-top: 20px;
+}
+.xiaod-report > section {
+  background: #fffdf8;
+  border: 1px solid #eadfcd;
+  border-radius: 16px;
+  padding: 24px;
+}
+.xiaod-report h2 {
+  margin-top: 0;
+}
+.xiaod-hero {
+  background: linear-gradient(135deg, #2d241c, #6c4528) !important;
+  color: white;
+}
+.xiaod-hero span,
+.xiaod-card > span,
+.xiaod-recommendation > span {
+  color: #d99b61;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.xiaod-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.xiaod-card {
+  background: white;
+  border: 1px solid #eadfcd;
+  border-radius: 12px;
+  padding: 18px;
+}
+.xiaod-card h3 {
+  margin: 8px 0;
+}
+.xiaod-card p {
+  line-height: 1.65;
+}
+.xiaod-ranking {
+  display: grid;
+  gap: 12px;
+  padding-left: 20px;
+}
+.xiaod-ranking li {
+  padding: 12px;
+}
+.xiaod-ranking span {
+  display: block;
+  color: #765b44;
+  margin-top: 6px;
+}
+.xiaod-recommendation {
+  background: #fff0d9;
+  border-left: 4px solid #c86b24;
+  border-radius: 8px;
+  padding: 18px;
+}
+.workbench-nav a.workbench-nav-child {
+  font-size: 13px;
+  margin-left: 28px;
+  min-height: 38px;
+}

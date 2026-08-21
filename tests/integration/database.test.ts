@@ -36,6 +36,7 @@ describe("database migrations", () => {
       "005_task_plans.sql",
       "006_ai_news_reports.sql",
       "007_notifications.sql",
+      "008_ai_opportunity_reports.sql",
     ]);
     expect(migrateDatabase(database)).toEqual([]);
     const tables = database
@@ -59,6 +60,7 @@ describe("database migrations", () => {
         "retrospectives",
         "ai_news_reports",
         "notifications",
+        "ai_opportunity_reports",
       ]),
     );
     expect(tables.map((table) => table.name)).not.toEqual(

@@ -21,6 +21,8 @@ import { AiNewsService } from "./modules/ai-news/ai-news-service";
 import { NotificationRepository } from "./modules/notifications/notification-repository";
 import { NotificationScanner } from "./modules/notifications/notification-scanner";
 import { NotificationService } from "./modules/notifications/notification-service";
+import { AiOpportunityRepository } from "./modules/ai-opportunities/ai-opportunity-repository";
+import { AiOpportunityService } from "./modules/ai-opportunities/ai-opportunity-service";
 
 const config = loadServerConfig();
 const database = openDatabase(config.databasePath);
@@ -41,6 +43,9 @@ const notificationService = new NotificationService(
   businessService,
 );
 const aiNewsService = new AiNewsService(new AiNewsRepository(database, notificationRepository));
+const aiOpportunityService = new AiOpportunityService(
+  new AiOpportunityRepository(database, notificationRepository),
+);
 const skillService = new SkillService(
   new CodexSkillGateway({ cwd: config.workingDirectory }),
   new SkillOriginRepository(database),
@@ -62,6 +67,7 @@ const app = buildApp(
   undefined,
   aiNewsService,
   notificationService,
+  aiOpportunityService,
 );
 
 notificationScanner.scan();

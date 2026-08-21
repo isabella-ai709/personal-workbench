@@ -14,7 +14,12 @@ export const notificationStatusSchema = z.enum([
 ]);
 export type NotificationStatus = z.infer<typeof notificationStatusSchema>;
 
-export const notificationSourceModuleSchema = z.enum(["task_plans", "business", "ai_news"]);
+export const notificationSourceModuleSchema = z.enum([
+  "task_plans",
+  "business",
+  "ai_news",
+  "ai_opportunities",
+]);
 export type NotificationSourceModule = z.infer<typeof notificationSourceModuleSchema>;
 
 export const notificationSourceTypeSchema = z.enum([
@@ -22,6 +27,7 @@ export const notificationSourceTypeSchema = z.enum([
   "partnership",
   "follow_up",
   "ai_news_report",
+  "ai_opportunity_report",
 ]);
 export type NotificationSourceType = z.infer<typeof notificationSourceTypeSchema>;
 

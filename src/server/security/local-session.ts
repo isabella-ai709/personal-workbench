@@ -39,7 +39,7 @@ export class LocalSession {
 
       const requestOrigin = request.headers.origin;
       if (
-        isAiNewsIntegrationRequest(request) &&
+        isReportIntegrationRequest(request) &&
         !requestOrigin &&
         hasJsonContentType(request) &&
         matchesBearerToken(request.headers.authorization, this.integrationToken)
@@ -66,10 +66,13 @@ export class LocalSession {
   }
 }
 
-function isAiNewsIntegrationRequest(request: FastifyRequest): boolean {
+function isReportIntegrationRequest(request: FastifyRequest): boolean {
   return (
     request.method === "PUT" &&
-    request.routeOptions.url === "/api/integrations/ai-news/reports/:reportId"
+    [
+      "/api/integrations/ai-news/reports/:reportId",
+      "/api/integrations/ai-opportunities/reports/:reportId",
+    ].includes(request.routeOptions.url ?? "")
   );
 }
 
