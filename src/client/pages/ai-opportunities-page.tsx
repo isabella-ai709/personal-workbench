@@ -97,6 +97,10 @@ export function AiOpportunitiesPage() {
                     <p>{item.what_happened}</p>
                     <strong>商业判断</strong>
                     <p>{item.business_judgment}</p>
+                    <strong>省时间</strong>
+                    <p>{String(item.time_saved ?? "公开信息未披露")}</p>
+                    <strong>多赚钱</strong>
+                    <p>{String(item.more_money ?? "公开信息未披露")}</p>
                     <strong>立即行动</strong>
                     <p>{item.immediate_action}</p>
                     {item.matched_terms.length ? (
@@ -157,10 +161,14 @@ export function AiOpportunitiesPage() {
                   <article className="xiaod-card" key={item.id}>
                     <span>{item.industry}</span>
                     <h3>{item.title}</h3>
+                    <p>
+                      <strong>抄作业对象：</strong>
+                      {item.copy_target}
+                    </p>
                     <p>{item.payment_reason}</p>
                     <p>
-                      <strong>准备：</strong>
-                      {item.materials.join("、")}
+                      <strong>落地简化：</strong>
+                      准备 {item.materials.join("、")}，按 {item.first_steps.join("；")} 执行。
                     </p>
                     <p>
                       <strong>难度：</strong>
