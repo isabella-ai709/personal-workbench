@@ -580,8 +580,29 @@
   font-size: 13px;
 }
 
+.workbench-nav a.workbench-nav-parent[aria-expanded="true"] {
+  color: var(--workbench-accent-deep);
+}
+
+.workbench-nav-chevron {
+  margin-left: auto;
+  transition: transform 180ms ease;
+}
+
+.workbench-nav-parent[aria-expanded="true"] .workbench-nav-chevron {
+  transform: rotate(180deg);
+}
+
+.workbench-nav-submenu {
+  display: grid;
+}
+
 @media (max-width: 820px) {
   .workbench-nav a.workbench-nav-child {
     margin-left: 0;
+  }
+
+  .workbench-nav-chevron {
+    display: none;
   }
 }

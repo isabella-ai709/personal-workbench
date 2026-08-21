@@ -2,6 +2,7 @@ import {
   AppsListDetail24Regular,
   Alert24Regular,
   Briefcase24Regular,
+  ChevronDown16Regular,
   Clock24Regular,
   Home24Regular,
   PlugConnected24Regular,
@@ -9,7 +10,8 @@ import {
   Toolbox24Regular,
 } from "@fluentui/react-icons";
 import { useQuery } from "@tanstack/react-query";
-import { NavLink, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { getNotificationSummary } from "../api/notification-client";
 
@@ -20,19 +22,30 @@ const activeItems = [
   { to: "/skills", label: "Skill 管理", icon: <Toolbox24Regular /> },
   { to: "/business", label: "商务合作", icon: <Briefcase24Regular /> },
   { to: "/retrospectives", label: "经验复盘", icon: <AppsListDetail24Regular /> },
-  { to: "/ai-news", label: "AI新闻资讯", icon: <News24Regular /> },
-  { to: "/ai-news/opportunities", label: "小D机会", icon: <News24Regular />, child: true },
 ];
 
 const futureItems = [{ label: "API 管理", icon: <PlugConnected24Regular /> }];
 
 export function WorkbenchLayout() {
+  const location = useLocation();
+  const [aiNewsExpanded, setAiNewsExpanded] = useState(() =>
+    location.pathname.startsWith("/ai-news"),
+  );
   const summary = useQuery({
     queryKey: ["notification-summary"],
     queryFn: getNotificationSummary,
     retry: false,
     refetchOnWindowFocus: true,
   });
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/ai-news/opportunities")) {
+      setAiNewsExpanded(true);
+    } else if (!location.pathname.startsWith("/ai-news")) {
+      setAiNewsExpanded(false);
+    }
+  }, [location.pathname]);
+
   return (
     <div className="workbench-shell">
       <aside className="workbench-sidebar" aria-label="工作台导航">
@@ -50,12 +63,7 @@ export function WorkbenchLayout() {
         </div>
         <nav className="workbench-nav">
           {activeItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/" || item.to === "/ai-news"}
-              className={item.child ? "workbench-nav-child" : undefined}
-            >
+            <NavLink key={item.to} to={item.to} end={item.to === "/" || item.to === "/ai-news"}>
               {item.icon}
               <span>{item.label}</span>
               {item.to === "/notifications" && (summary.data?.importantUnread ?? 0) > 0 ? (
@@ -70,6 +78,25 @@ export function WorkbenchLayout() {
               ) : null}
             </NavLink>
           ))}
+          <NavLink
+            to="/ai-news"
+            end
+            className="workbench-nav-parent"
+            aria-expanded={aiNewsExpanded}
+            onClick={() => setAiNewsExpanded((expanded) => !expanded)}
+          >
+            <News24Regular />
+            <span>AI新闻资讯</span>
+            <ChevronDown16Regular className="workbench-nav-chevron" aria-hidden="true" />
+          </NavLink>
+          {aiNewsExpanded ? (
+            <div className="workbench-nav-submenu" aria-label="AI新闻资讯子频道">
+              <NavLink to="/ai-news/opportunities" className="workbench-nav-child">
+                <News24Regular />
+                <span>小D机会</span>
+              </NavLink>
+            </div>
+          ) : null}
           <div className="workbench-nav-section" aria-label="后续版本">
             <span className="workbench-nav-label">后续版本</span>
             {futureItems.map((item) => (
