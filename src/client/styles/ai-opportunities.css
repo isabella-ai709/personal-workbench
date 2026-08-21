@@ -1,75 +1,523 @@
-.xiaod-eyebrow {
-  color: #8b5e34;
+.xiaod-page {
+  --xiaod-ink: #19313d;
+  --xiaod-muted: #617682;
+  --xiaod-line: #d8e3e8;
+  --xiaod-surface: #ffffff;
+  --xiaod-surface-soft: #f6f9fa;
+  --xiaod-accent: #c56532;
+  --xiaod-accent-soft: #fff1e8;
+  min-width: 0;
+  color: var(--xiaod-ink);
+}
+
+.xiaod-masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 306px);
+  gap: 32px;
+  align-items: end;
+  padding: 4px 0 26px;
+  border-bottom: 1px solid var(--xiaod-line);
+}
+
+.xiaod-masthead-copy {
+  min-width: 0;
+}
+
+.xiaod-kicker {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--xiaod-accent);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  margin: 0 0 6px;
-  text-transform: uppercase;
 }
+
+.xiaod-masthead h1 {
+  margin: 0;
+  color: var(--xiaod-ink);
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 720;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.xiaod-masthead p {
+  max-width: 46rem;
+  margin: 12px 0 0;
+  color: var(--xiaod-muted);
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.xiaod-toolbar {
+  display: grid;
+  gap: 9px;
+  padding: 14px 15px;
+  border: 1px solid var(--xiaod-line);
+  border-radius: 12px;
+  background: var(--xiaod-surface);
+  box-shadow: 0 8px 22px rgb(25 49 61 / 6%);
+}
+
+.xiaod-toolbar > label {
+  color: var(--xiaod-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.xiaod-toolbar-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.xiaod-period-select {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 30px 6px 10px;
+  border: 1px solid #b9ccd5;
+  border-radius: 8px;
+  color: var(--xiaod-ink);
+  background: #fbfdfe;
+  font: inherit;
+}
+
+.xiaod-period-select:hover {
+  border-color: var(--xiaod-accent);
+}
+
+.xiaod-period-select:focus-visible,
+.xiaod-page a:focus-visible,
+.xiaod-page button:focus-visible {
+  outline: 3px solid rgb(197 101 50 / 28%);
+  outline-offset: 2px;
+}
+
+.xiaod-refresh-button {
+  min-height: 36px;
+  border-radius: 8px !important;
+  white-space: nowrap;
+}
+
+.xiaod-refresh-button:hover {
+  transform: translateY(-1px);
+}
+
+.xiaod-refresh-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.xiaod-sync-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 18px;
+  align-items: center;
+  min-height: 46px;
+  padding: 11px 14px;
+  margin: 18px 0 0;
+  border: 1px solid var(--xiaod-line);
+  border-radius: 8px;
+  color: var(--xiaod-muted);
+  background: var(--xiaod-surface);
+  font-size: 12px;
+}
+
+.xiaod-sync-strip strong {
+  color: var(--xiaod-ink);
+}
+
+.xiaod-sync-strip span + span {
+  padding-left: 18px;
+  border-left: 1px solid var(--xiaod-line);
+}
+
 .xiaod-report {
   display: grid;
-  gap: 24px;
-  margin-top: 20px;
+  gap: 18px;
+  margin-top: 18px;
 }
+
 .xiaod-report > section {
-  background: #fffdf8;
-  border: 1px solid #eadfcd;
-  border-radius: 16px;
-  padding: 24px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--xiaod-line);
+  border-radius: 12px;
+  background: var(--xiaod-surface);
+  box-shadow: 0 8px 24px rgb(25 49 61 / 4%);
 }
-.xiaod-report h2 {
-  margin-top: 0;
+
+.xiaod-report > section > h2 {
+  margin: 0 0 20px;
+  color: var(--xiaod-ink);
+  font-size: clamp(20px, 2vw, 26px);
+  letter-spacing: -0.035em;
 }
+
 .xiaod-hero {
-  background: linear-gradient(135deg, #2d241c, #6c4528) !important;
-  color: white;
+  position: relative;
+  overflow: hidden;
+  padding-left: clamp(26px, 4vw, 44px) !important;
+  background: linear-gradient(90deg, #fff8f3 0%, #ffffff 65%) !important;
 }
-.xiaod-hero span,
+
+.xiaod-hero::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--xiaod-accent);
+  content: "";
+}
+
+.xiaod-hero > span,
 .xiaod-card > span,
 .xiaod-recommendation > span {
-  color: #d99b61;
+  color: var(--xiaod-accent);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
+
+.xiaod-hero h2 {
+  max-width: 52rem;
+  margin: 12px 0 10px;
+  color: var(--xiaod-ink);
+  font-size: clamp(22px, 3vw, 34px);
+  letter-spacing: -0.045em;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+.xiaod-hero p,
+.xiaod-card p {
+  color: var(--xiaod-muted);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.xiaod-hero p {
+  max-width: 68ch;
+  margin-bottom: 0;
+}
+
 .xiaod-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
+
 .xiaod-card {
-  background: white;
-  border: 1px solid #eadfcd;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--xiaod-line);
   border-radius: 12px;
+  background: var(--xiaod-surface-soft);
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.xiaod-card:hover {
+  border-color: #b9ccd5;
+  transform: translateY(-1px);
+}
+
+.xiaod-card h3 {
+  margin: 8px 0 10px;
+  color: var(--xiaod-ink);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.xiaod-card p {
+  margin: 9px 0;
+}
+
+.xiaod-card strong {
+  color: var(--xiaod-ink);
+}
+
+.xiaod-card b {
+  color: var(--xiaod-accent);
+}
+
+.xiaod-card a {
+  display: inline-block;
+  margin-top: 8px;
+  color: #9d4c25;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.xiaod-cases-section .xiaod-grid {
+  grid-template-columns: 1fr;
+}
+
+.xiaod-cases-section .xiaod-card {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.45fr) minmax(0, 1fr);
+  gap: 4px 22px;
+}
+
+.xiaod-cases-section .xiaod-card h3 {
+  grid-row: span 3;
+  align-self: start;
+  margin-top: 0;
+}
+
+.xiaod-cases-section .xiaod-card p {
+  margin: 3px 0;
+}
+
+.xiaod-sales-kit {
+  display: grid;
+  grid-template-columns: 0.9fr 1.2fr 1.1fr;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.xiaod-sales-kit p {
+  min-width: 0;
+  margin: 0;
   padding: 18px;
 }
-.xiaod-card h3 {
-  margin: 8px 0;
+
+.xiaod-sales-kit p + p {
+  border-left: 1px solid var(--xiaod-line);
 }
-.xiaod-card p {
-  line-height: 1.65;
+
+.xiaod-side-hustles-section .xiaod-card {
+  background: #ffffff;
 }
+
 .xiaod-ranking {
   display: grid;
-  gap: 12px;
-  padding-left: 20px;
+  gap: 8px;
+  margin: 0;
+  padding-left: 25px;
 }
+
 .xiaod-ranking li {
-  padding: 12px;
+  padding: 13px 15px 13px 4px;
+  border-bottom: 1px solid var(--xiaod-line);
 }
+
+.xiaod-ranking li:last-child {
+  border-bottom: 0;
+}
+
+.xiaod-ranking li::marker {
+  color: var(--xiaod-accent);
+  font-weight: 800;
+}
+
+.xiaod-ranking li > strong {
+  color: var(--xiaod-ink);
+}
+
 .xiaod-ranking span {
   display: block;
-  color: #765b44;
-  margin-top: 6px;
-}
-.xiaod-recommendation {
-  background: #fff0d9;
-  border-left: 4px solid #c86b24;
-  border-radius: 8px;
-  padding: 18px;
-}
-.workbench-nav a.workbench-nav-child {
+  margin-top: 5px;
+  color: var(--xiaod-muted);
   font-size: 13px;
-  margin-left: 28px;
+}
+
+.xiaod-ranking p {
+  margin-bottom: 0;
+  color: var(--xiaod-muted);
+  line-height: 1.65;
+}
+
+.xiaod-recommendation {
+  padding: 18px;
+  margin-top: 18px;
+  border: 1px solid #e9b08e;
+  border-radius: 12px;
+  background: var(--xiaod-accent-soft);
+}
+
+.xiaod-recommendation h3 {
+  margin: 7px 0;
+  color: var(--xiaod-ink);
+}
+
+.xiaod-recommendation p {
+  margin-bottom: 0;
+  color: #71452f;
+  line-height: 1.65;
+}
+
+.xiaod-empty-state {
+  min-height: 280px;
+  margin-top: 18px;
+  border-radius: 12px;
+  background: var(--xiaod-surface);
+  box-shadow: 0 8px 24px rgb(25 49 61 / 4%);
+}
+
+.xiaod-empty-state h2 {
+  color: var(--xiaod-ink);
+}
+
+.xiaod-empty-state p {
+  color: var(--xiaod-muted);
+}
+
+.xiaod-feedback {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.xiaod-masthead-compact {
+  grid-template-columns: 1fr;
+}
+
+.xiaod-loading-grid {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.xiaod-skeleton {
+  border-radius: 8px;
+  background: #e7eff2;
+}
+
+.xiaod-skeleton-title {
+  width: min(310px, 70%);
+  height: 54px;
+}
+
+.xiaod-skeleton-copy {
+  width: min(520px, 88%);
+  height: 18px;
+  margin-top: 14px;
+}
+
+.xiaod-skeleton-toolbar {
+  height: 92px;
+}
+
+.xiaod-skeleton-status {
+  height: 46px;
+}
+
+.xiaod-skeleton-panel {
+  height: 180px;
+}
+
+@media (max-width: 820px) {
+  .workbench-nav a.workbench-nav-child {
+    margin-left: 0;
+  }
+
+  .xiaod-masthead {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .xiaod-toolbar {
+    max-width: none;
+  }
+
+  .xiaod-grid,
+  .xiaod-sales-kit {
+    grid-template-columns: 1fr;
+  }
+
+  .xiaod-cases-section .xiaod-card {
+    display: block;
+  }
+
+  .xiaod-cases-section .xiaod-card h3 {
+    margin-bottom: 12px;
+  }
+
+  .xiaod-sales-kit p + p {
+    border-top: 1px solid var(--xiaod-line);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .xiaod-masthead h1 {
+    font-size: 42px;
+  }
+
+  .xiaod-toolbar-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .xiaod-refresh-button {
+    width: 100%;
+  }
+
+  .xiaod-sync-strip {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .xiaod-sync-strip span + span {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .xiaod-page {
+    --xiaod-ink: #e4edf0;
+    --xiaod-muted: #a5bac2;
+    --xiaod-line: #344b55;
+    --xiaod-surface: #172a32;
+    --xiaod-surface-soft: #1c343e;
+    --xiaod-accent: #ef9a68;
+    --xiaod-accent-soft: #3d2a21;
+  }
+
+  .xiaod-period-select {
+    border-color: #49636e;
+    color: var(--xiaod-ink);
+    background: #1c343e;
+  }
+
+  .xiaod-hero {
+    background: #20343c !important;
+  }
+
+  .xiaod-recommendation p {
+    color: #f0c0a5;
+  }
+
+  .xiaod-skeleton {
+    background: #29434d;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xiaod-card,
+  .xiaod-refresh-button {
+    transition: none;
+  }
+
+  .xiaod-card:hover,
+  .xiaod-refresh-button:hover,
+  .xiaod-refresh-button:active {
+    transform: none;
+  }
+}
+
+.workbench-nav a.workbench-nav-child {
   min-height: 38px;
+  margin-left: 28px;
+  font-size: 13px;
+}
+
+@media (max-width: 820px) {
+  .workbench-nav a.workbench-nav-child {
+    margin-left: 0;
+  }
 }

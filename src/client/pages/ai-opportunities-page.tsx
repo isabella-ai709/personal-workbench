@@ -25,17 +25,40 @@ export function AiOpportunitiesPage() {
 
   if (report.isPending)
     return (
-      <div className="page-frame">
-        <p>正在加载小D机会周报…</p>
+      <div className="page-frame ai-news-page xiaod-page">
+        <header className="xiaod-masthead xiaod-masthead-loading" aria-busy="true">
+          <div className="xiaod-masthead-copy">
+            <span className="xiaod-kicker">AI新闻资讯 / 子频道</span>
+            <div className="xiaod-skeleton xiaod-skeleton-title" />
+            <div className="xiaod-skeleton xiaod-skeleton-copy" />
+          </div>
+          <div className="xiaod-skeleton xiaod-skeleton-toolbar" />
+        </header>
+        <div className="xiaod-loading-grid" aria-label="正在加载小D机会周报">
+          <div className="xiaod-skeleton xiaod-skeleton-status" />
+          <div className="xiaod-skeleton xiaod-skeleton-panel" />
+          <div className="xiaod-skeleton xiaod-skeleton-panel" />
+        </div>
       </div>
     );
   if (report.isError)
     return (
-      <div className="page-frame">
-        <MessageBar intent="error">
-          <MessageBarBody>小D机会周报暂时无法读取。</MessageBarBody>
-        </MessageBar>
-        <Button onClick={refresh}>重新加载</Button>
+      <div className="page-frame ai-news-page xiaod-page">
+        <header className="xiaod-masthead xiaod-masthead-compact">
+          <div className="xiaod-masthead-copy">
+            <span className="xiaod-kicker">AI新闻资讯 / 子频道</span>
+            <h1>小D机会</h1>
+            <p>从过去 7 天 AI 资讯中提炼能成交、能复制、能落地的机会。</p>
+          </div>
+        </header>
+        <div className="xiaod-feedback">
+          <MessageBar intent="error">
+            <MessageBarBody>小D机会周报暂时无法读取。</MessageBarBody>
+          </MessageBar>
+          <Button className="xiaod-refresh-button" onClick={refresh}>
+            重新加载
+          </Button>
+        </div>
       </div>
     );
   const detail = report.data;
@@ -46,34 +69,46 @@ export function AiOpportunitiesPage() {
 
   return (
     <div className="page-frame ai-news-page xiaod-page">
-      <header className="page-heading ai-news-page-heading">
-        <div>
-          <p className="xiaod-eyebrow">AI新闻资讯 / 子频道</p>
+      <header className="xiaod-masthead">
+        <div className="xiaod-masthead-copy">
+          <span className="xiaod-kicker">AI新闻资讯 / 子频道</span>
           <h1>小D机会</h1>
           <p>从过去 7 天 AI 资讯中提炼能成交、能复制、能落地的机会。</p>
         </div>
-        <div className="ai-news-actions">
-          <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
-            <option value="">最新一期</option>
-            {reports.data?.map((item) => (
-              <option key={item.reportId} value={item.reportId}>
-                {item.year}年第{item.week}周
-              </option>
-            ))}
-          </select>
-          <Button icon={<ArrowClockwise20Regular />} onClick={refresh}>
-            刷新数据
-          </Button>
+        <div className="xiaod-toolbar" aria-label="周报操作">
+          <label htmlFor="xiaod-report-period">周报期次</label>
+          <div className="xiaod-toolbar-controls">
+            <select
+              id="xiaod-report-period"
+              className="xiaod-period-select"
+              value={selectedId}
+              onChange={(event) => setSelectedId(event.target.value)}
+            >
+              <option value="">最新一期</option>
+              {reports.data?.map((item) => (
+                <option key={item.reportId} value={item.reportId}>
+                  {item.year}年第{item.week}周
+                </option>
+              ))}
+            </select>
+            <Button
+              className="xiaod-refresh-button"
+              icon={<ArrowClockwise20Regular />}
+              onClick={refresh}
+            >
+              刷新数据
+            </Button>
+          </div>
         </div>
       </header>
       {!data ? (
-        <div className="ai-news-empty">
+        <div className="ai-news-empty xiaod-empty-state">
           <h2>还没有小D机会周报</h2>
           <p>自动化首次推送后，这里会显示完整的商业机会分析。</p>
         </div>
       ) : (
         <>
-          <section className="ai-news-status">
+          <section className="ai-news-status xiaod-sync-strip" aria-label="本期同步范围">
             <strong>过去 7 天机会已同步</strong>
             <span>
               {data.start_date} 至 {data.end_date}
@@ -83,12 +118,12 @@ export function AiOpportunitiesPage() {
           </section>
           <article className="xiaod-report">
             <section className="xiaod-hero">
-              <span>01 本周搞钱判断</span>
+              <span>本周搞钱判断</span>
               <h2>{data.money_judgment}</h2>
               <p>{data.summary}</p>
             </section>
             <section>
-              <h2>02 行业机会雷达</h2>
+              <h2>行业机会雷达</h2>
               <div className="xiaod-grid">
                 {data.radar_items.map((item) => (
                   <article className="xiaod-card" key={item.id}>
@@ -118,8 +153,8 @@ export function AiOpportunitiesPage() {
                 ))}
               </div>
             </section>
-            <section>
-              <h2>03 落地案例</h2>
+            <section className="xiaod-cases-section">
+              <h2>落地案例</h2>
               <div className="xiaod-grid">
                 {data.case_studies.map((item, index) => (
                   <article className="xiaod-card" key={index}>
@@ -137,9 +172,9 @@ export function AiOpportunitiesPage() {
                 ))}
               </div>
             </section>
-            <section>
-              <h2>04 本周销售素材</h2>
-              <div className="xiaod-card">
+            <section className="xiaod-sales-section">
+              <h2>本周销售素材</h2>
+              <div className="xiaod-card xiaod-sales-kit">
                 <p>
                   <strong>朋友圈：</strong>
                   {String(data.sales_kit.moments_copy ?? "")}
@@ -154,8 +189,8 @@ export function AiOpportunitiesPage() {
                 </p>
               </div>
             </section>
-            <section>
-              <h2>05 副业灵感池</h2>
+            <section className="xiaod-side-hustles-section">
+              <h2>副业灵感池</h2>
               <div className="xiaod-grid">
                 {data.side_hustles.map((item) => (
                   <article className="xiaod-card" key={item.id}>
@@ -179,8 +214,8 @@ export function AiOpportunitiesPage() {
                 ))}
               </div>
             </section>
-            <section>
-              <h2>06 本周副业优先排序</h2>
+            <section className="xiaod-ranking-section">
+              <h2>本周副业优先排序</h2>
               <ol className="xiaod-ranking">
                 {data.ranking.map((item) => (
                   <li key={item.opportunity_id}>
