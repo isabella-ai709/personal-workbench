@@ -16,6 +16,7 @@
 - 36氪两个官方 Feed 无需登录，真实网络解析文章/快讯各 5 条；补充了其数字时区日期格式。
 - `ai-weekly`：27 项测试全部通过。
 - 真实最近 7 天双分支运行成功：AI 分支 246 篇/10 个事件，小D分支 346 条原始资讯、159 条窗口内资讯、1 条强相关机会；VentureBeat 单源失败被隔离。
+- 备用端口工作台真实 HTTP 闭环通过：迁移后写入小D报告、幂等读取列表/最新报告、前端 Vite API 代理均返回 200；浏览器 WebView 连接受限，页面以服务响应和生产构建完成验证。
 - `personal-workbench`：75 项通过、1 项原有跳过；TypeScript、ESLint、生产构建通过。
 - 用户原有未提交改动 `scripts/start-local.ps1`、`src/client/styles/tokens.css` 保持未提交且未纳入本次提交。
 
